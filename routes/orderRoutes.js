@@ -10,8 +10,8 @@ const {
   rejectOrder,
 } = require("../controllers/orderController");
 
-router.post("/",auth, createOrder);
-router.get("/:id",auth, getOrderById);
+router.post("/", createOrder);
+router.get("/:id", getOrderById);
 router.get("/", getAllOrders);
 router.patch("/:id/accept", acceptOrder);
 router.patch("/:id/reject", rejectOrder);
