@@ -11,7 +11,7 @@ const {
 } = require("../controllers/orderController");
 
 router.post("/", createOrder);
-router.get("/:id", getOrderById);
+router.get("/:id",auth, getOrderById);
 router.get("/", getAllOrders);
 router.patch("/:id/accept", acceptOrder);
 router.patch("/:id/reject", rejectOrder);

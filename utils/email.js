@@ -19,10 +19,6 @@ const C_title = `Congratulations Order Placed @ Fruit Co`
 
 exports.sendOrderPlacedEmail = async (order) => {
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error("Missing EMAIL_USER or EMAIL_PASS in environment variables");
-        process.exit(1);
-      }
 
 
     const orderStatusUrl = `http://localhost:3000/check-order-status/${order._id}`;
