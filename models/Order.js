@@ -8,6 +8,7 @@ const orderSchema = new mongoose.Schema({
   plan: { type: String, required: true },
   deliveryDate: { type: Date, required: true },
   status: { type: String, default: "Pending" },
+  moreInfo: { type: String, required: false }  
 }, { timestamps: true });
 
 module.exports = mongoose.model("Order", orderSchema);

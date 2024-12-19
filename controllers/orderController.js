@@ -46,19 +46,30 @@ exports.acceptOrder = async (req, res) => {
     await order.save();
     res.send({ message: "Order accepted", orderId: order._id });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error });
   }
 };
 
 exports.rejectOrder = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).send({ message: "Order not found" });
-
-    order.status = "Rejected";
-    await order.save();
-    res.send({ message: "Order rejected", orderId: order._id });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-};
+    try {
+      const { reason } = req.body;  // Capture rejection reason
+  
+      // Find the order by ID
+      const order = await Order.findById(req.params.id);
+      if (!order) return res.status(404).send({ message: "Order not found" });
+  
+      // Set the order status to "Rejected"
+      order.status = "Rejected";
+  
+      // Save the rejection reason in the moreInfo field
+      order.moreInfo = reason;  // Store rejection reason in moreInfo
+  
+      await order.save();  // Save the updated order
+  
+      res.send({ message: "Order rejected", orderId: order._id });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
