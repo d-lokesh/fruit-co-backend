@@ -71,11 +71,16 @@ exports.rejectOrder = async (req, res) => {
   
       await order.save();  // Save the updated order
 
+      try{
       await sendOrderRejectedEmail(order);
-  
+      }
+      catch(error){
+        console.log("error sending email, on reject order");
+        console.log(error);
+
+      }
       res.send({ message: "Order rejected", orderId: order._id });
     } catch (error) {
-        console.log(error);
       res.status(500).json({ error: error.message });
     }
   };
