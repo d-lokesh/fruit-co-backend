@@ -1,5 +1,8 @@
 const Order = require("../models/Order");
 const { sendOrderPlacedEmail } = require("../utils/email");
+const {sendOrderRejectedEmail} = require("../utils/rejectOrder_email")
+const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
+
 
 
 exports.createOrder = async (req, res) => {
@@ -45,6 +48,7 @@ exports.acceptOrder = async (req, res) => {
     order.status = "Accepted";
     await order.save();
     res.send({ message: "Order accepted", orderId: order._id });
+    await sendOrderAcceptedEmail(order);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
@@ -66,10 +70,32 @@ exports.rejectOrder = async (req, res) => {
       order.moreInfo = reason;  // Store rejection reason in moreInfo
   
       await order.save();  // Save the updated order
+
+      await sendOrderRejectedEmail(order);
   
       res.send({ message: "Order rejected", orderId: order._id });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+
+  exports.deleteOrdersIfEmailEmpty = async (req, res) => {
+    try {
+      const ordersToDelete = await Order.find({ email: { $in: ['', null] } });
+  
+      if (ordersToDelete.length === 0) {
+        return res.status(404).send({ message: "No orders with empty email found" });
+      }
+  
+      await Order.deleteMany({ email: { $in: ['', null] } });
+  
+      res.send({ message: `${ordersToDelete.length} orders deleted because email is empty` });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'An error occurred while processing the request' });
+    }
+  };
+  
   
