@@ -75,6 +75,7 @@ exports.rejectOrder = async (req, res) => {
   
       res.send({ message: "Order rejected", orderId: order._id });
     } catch (error) {
+        console.log(error);
       res.status(500).json({ error: error.message });
     }
   };
