@@ -14,7 +14,7 @@ exports.createOrder = async (req, res) => {
 
     await sendOrderPlacedEmail(savedOrder);
 
-    res.status(201).json({ message: "Order placed successfully!", orderId: savedOrder._id });
+    res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error placing order", error: err.message });
