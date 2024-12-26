@@ -134,7 +134,7 @@ exports.sendOrderRejectedEmail = async (order) => {
       <div class="footer">
         <p>We're sorry for any inconvenience caused. Please feel free to contact us for further assistance.</p>
         <p>From the Team, Fruit Co</p>
-        <p>&copy; 2024 Fruit Bowl. All rights reserved.</p>
+        <p>&copy; 2024 Daily Fruit Co. All rights reserved.</p> 
       </div>
     </div>
   </body>

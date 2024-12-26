@@ -9,14 +9,17 @@ const {
   acceptOrder,
   rejectOrder,
   deleteOrdersIfEmailEmpty,
+  getOrderByQuery,
 } = require("../controllers/orderController");
 
 router.post("/", createOrder);
 router.get("/:id", getOrderById);
-router.get("/", getAllOrders);
-router.patch("/:id/accept", acceptOrder);
-router.patch("/:id/reject", rejectOrder);
-router.delete('/deleteIfEmailEmpty', deleteOrdersIfEmailEmpty); // Define the route
+router.get("/",auth, getAllOrders);
+router.patch("/:id/accept",auth, acceptOrder);
+router.patch("/:id/reject",auth, rejectOrder);
+router.delete('/deleteIfEmailEmpty',auth, deleteOrdersIfEmailEmpty); // Define the route
+router.get('/orderData', getOrderByQuery);
+
 
 
 module.exports = router;

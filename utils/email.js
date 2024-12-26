@@ -43,7 +43,7 @@ exports.sendOrderPlacedEmail = async (order) => {
        <div class="footer"> 
          <p>Thank you for choosing us!</p> 
          <p>From the Team, Fruit Co</p> 
-         <p>&copy; 2024 Fruit Bowl. All rights reserved.</p> 
+        <p>&copy; 2024 Daily Fruit Co. All rights reserved.</p> 
        </div> 
        </div> </body> </html>`;
 

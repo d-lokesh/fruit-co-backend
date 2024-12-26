@@ -158,7 +158,7 @@ exports.sendOrderAcceptedEmail = async (order) => {
       <div class="footer">
         <p>Thank you for choosing Fruit Co for your healthy lifestyle needs!</p>
         <img src="https://example.com/path-to-fruit-logo.png" alt="Fruit Co Logo">
-        <p>&copy; 2024 Fruit Co. All rights reserved.</p>
+        <p>&copy; 2024 Daily Fruit Co. All rights reserved.</p> 
       </div>
     </div>
   </body>

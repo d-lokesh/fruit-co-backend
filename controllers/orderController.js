@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const { sendOrderPlacedEmail } = require("../utils/email");
 const {sendOrderRejectedEmail} = require("../utils/rejectOrder_email")
 const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
+const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
 
 
 
@@ -13,6 +14,7 @@ exports.createOrder = async (req, res) => {
     const savedOrder = await newOrder.save();
 
     await sendOrderPlacedEmail(savedOrder);
+    await sendAdminNotificationEmail(order);
 
     res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
   } catch (err) {
@@ -24,6 +26,7 @@ exports.createOrder = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
+    
     if (!order) return res.status(404).send({ message: "Order not found" });
     res.status(200).json(order);
   } catch (error) {
@@ -103,5 +106,45 @@ exports.rejectOrder = async (req, res) => {
       res.status(500).json({ error: 'An error occurred while processing the request' });
     }
   };
+  exports.getOrderByQuery = async (req, res) => {
+    console.log("started");
+    const { query } = req.query;
+    console.log("end");
+    // Check if query parameter is provided
+    if (!query) {
+      return res.status(400).send({ message: 'Query parameter is required' });
+    }
   
+    console.log('Received query:', query);
+  
+    try {
+      // Check if query is a valid ObjectId
+      const isValidObjectId = mongoose.Types.ObjectId.isValid(query);
+  
+      // Build the search criteria based on the query type
+      let searchCriteria = {};
+      
+      // If query is a valid ObjectId, search by _id
+      if (isValidObjectId) {
+        searchCriteria._id = query;
+      } else {
+        // Otherwise, search by phone number
+        searchCriteria.phone = query;
+      }
+  
+      // Find the order using the appropriate search criteria
+      const order = await Order.findOne(searchCriteria);
+  
+      // If no order found, return 404
+      if (!order) {
+        return res.status(404).send({ message: 'Order not found' });
+      }
+  
+      // Return the found order
+      res.send(order);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      res.status(500).json({ error: 'An error occurred while processing the request' });
+    }
+  };
   
