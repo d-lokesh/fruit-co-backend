@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 const adminTitle = `New Order Received @ Fruit Co`;
 
 exports.sendAdminNotificationEmail = async (order) => {
-  const adminPortalUrl = `https://animated-druid-0e2e3c.netlify.app/login`;
+  const adminPortalUrl = `https://animated-druid-0e2e3c.netlify.app`;
 
   const adminHtml = `<!DOCTYPE html> 
   <html lang="en"> 
