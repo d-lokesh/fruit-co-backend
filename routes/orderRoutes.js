@@ -5,7 +5,8 @@ const auth = require('../middleware/auth'); // Import the auth middleware
 const {
   createOrder,
   getOrderById,
-  getAllOrders,
+  getSubscriptionOrders,
+  getSampleOrders,
   acceptOrder,
   rejectOrder,
   deleteOrdersIfEmailEmpty,
@@ -14,7 +15,8 @@ const {
 
 router.post("/", createOrder);
 router.get("/:id", getOrderById);
-router.get("/",auth, getAllOrders);
+router.get("/subsciprtions",auth, getSubscriptionOrders);
+router.get("/samples",auth, getSampleOrders);
 router.patch("/:id/accept",auth, acceptOrder);
 router.patch("/:id/reject",auth, rejectOrder);
 router.delete('/deleteIfEmailEmpty',auth, deleteOrdersIfEmailEmpty); // Define the route

@@ -8,9 +8,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const A_title = `🍎 Your Order Has Been Accepted! Let's Get Healthy!`;
-
 exports.sendOrderAcceptedEmail = async (order) => {
+  // Determine email title and content based on order type
+  const isSampleOrder = order.orderType === "sample";
+  const A_title = isSampleOrder
+    ? `🍎 Your Sample Order Has Been Accepted!`
+    : `🍎 Your Subscription Order Has Been Accepted!`;
+
+  const orderMessage = isSampleOrder
+    ? `<p class="highlight">Great news! Your sample order is being prepared and will be shipped soon.</p>`
+    : `<p class="highlight">Fantastic! Your subscription order is confirmed and is being prepared for delivery.</p>`;
+
   const A_html = `
   <!DOCTYPE html>
   <html lang="en">
@@ -119,7 +127,7 @@ exports.sendOrderAcceptedEmail = async (order) => {
         "Start your healthy lifestyle journey with Fruit Co!"
       </div>
       <div class="order-details">
-        <p class="highlight">Congratulations! Your order has been accepted and is being prepared for delivery.</p>
+        ${orderMessage}
         <b>Here are the details of your order:</b>
         <table>
           <tr>

@@ -6,37 +6,94 @@ const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmai
 
 
 
+const SampleOrder = require("../models/sampleOrderSchema");
+const SubscriptionOrder = require("../models/subscriptionOrderSchema");
+
 exports.createOrder = async (req, res) => {
-  const { name, address, phone, email, plan, deliveryDate } = req.body;
+  const { name, address, phone, email, plan, deliveryDate, orderType, moreInfo } = req.body;
 
   try {
-    const newOrder = new Order({ name, address, phone, email, plan, deliveryDate });
-    const savedOrder = await newOrder.save();
+    let savedOrder;
 
+    if (orderType === "sample") {
+      // Save to SampleOrder collection
+      const newSampleOrder = new SampleOrder({
+        name,
+        address,
+        phone,
+        email,
+        plan,
+        deliveryDate,
+        orderType,
+        moreInfo,
+      });
+      savedOrder = await newSampleOrder.save();
+    } else if (orderType === "subscription") {
+      // Save to SubscriptionOrder collection
+      const newSubscriptionOrder = new SubscriptionOrder({
+        name,
+        address,
+        phone,
+        email,
+        plan,
+        deliveryDate,
+        orderType,
+        moreInfo,
+      });
+      savedOrder = await newSubscriptionOrder.save();
+    } else {
+      return res.status(400).json({ message: "Invalid order type" });
+    }
+
+    // Send notifications
     await sendOrderPlacedEmail(savedOrder);
     await sendAdminNotificationEmail(savedOrder);
 
     res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Error placing order", error: err.message });
   }
 };
 
+
 exports.getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
-    
-    if (!order) return res.status(404).send({ message: "Order not found" });
+    const { id } = req.params;
+
+    // First, try finding the order in the SampleOrder model
+    let order = await SampleOrder.findById(id);
+
+    // If not found in SampleOrder, try finding it in SubscriptionOrder
+    if (!order) {
+      order = await SubscriptionOrder.findById(id);
+    }
+
+    // If not found in either, return 404
+    if (!order) {
+      return res.status(404).send({ message: "Order not found" });
+    }
+
+    // Return the found order
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: error.message });
   }
 };
 
-exports.getAllOrders = async (req, res) => {
+
+exports.getSubscriptionOrders = async (req, res) => {
   try {
-    const orders = await Order.find();
+    const orders = await SubscriptionOrder.find();
+    res.status(200).json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching orders", error: err.message });
+  }
+};
+
+exports.getSampleOrders = async (req, res) => {
+  try {
+    const orders = await SampleOrder.find();
     res.status(200).json(orders);
   } catch (err) {
     res.status(500).json({ message: "Error fetching orders", error: err.message });
@@ -45,48 +102,82 @@ exports.getAllOrders = async (req, res) => {
 
 exports.acceptOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).send({ message: "Order not found" });
+    const { id, orderType } = req.params; // Assuming `orderType` is passed in the request
 
+    let order;
+
+    // Determine which model to query based on `orderType`
+    if (orderType === "sample") {
+      order = await SampleOrder.findById(id);
+    } else if (orderType === "subscription") {
+      order = await SubscriptionOrder.findById(id);
+    } else {
+      return res.status(400).send({ message: "Invalid order type" });
+    }
+
+    // Handle case where the order is not found
+    if (!order) {
+      return res.status(404).send({ message: "Order not found" });
+    }
+
+    // Update order status to "Accepted"
     order.status = "Accepted";
     await order.save();
+
+    // Send a response back to the client
     res.send({ message: "Order accepted", orderId: order._id });
+
+    // Send an email notification
     await sendOrderAcceptedEmail(order);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error });
+    res.status(500).json({ error: error.message });
   }
 };
 
+
 exports.rejectOrder = async (req, res) => {
-    try {
-      const { reason } = req.body;  // Capture rejection reason
-  
-      // Find the order by ID
-      const order = await Order.findById(req.params.id);
-      if (!order) return res.status(404).send({ message: "Order not found" });
-  
-      // Set the order status to "Rejected"
-      order.status = "Rejected";
-  
-      // Save the rejection reason in the moreInfo field
-      order.moreInfo = reason;  // Store rejection reason in moreInfo
-  
-      await order.save();  // Save the updated order
+  try {
+    const { id, orderType } = req.params; // Assuming `orderType` is passed in the request
+    const { reason } = req.body; // Capture rejection reason
 
-      try{
-      await sendOrderRejectedEmail(order);
-      }
-      catch(error){
-        console.log("error sending email, on reject order");
-        console.log(error);
+    let order;
 
-      }
-      res.send({ message: "Order rejected", orderId: order._id });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    // Determine which model to query based on `orderType`
+    if (orderType === "sample") {
+      order = await SampleOrder.findById(id);
+    } else if (orderType === "subscription") {
+      order = await SubscriptionOrder.findById(id);
+    } else {
+      return res.status(400).send({ message: "Invalid order type" });
     }
-  };
+
+    // Handle case where the order is not found
+    if (!order) {
+      return res.status(404).send({ message: "Order not found" });
+    }
+
+    // Set the order status to "Rejected" and store the rejection reason
+    order.status = "Rejected";
+    order.moreInfo = reason; // Save the rejection reason in the `moreInfo` field
+
+    // Save the updated order
+    await order.save();
+
+    // Send an email notification
+    try {
+      await sendOrderRejectedEmail(order);
+    } catch (emailError) {
+      console.log("Error sending rejection email:", emailError);
+    }
+
+    // Respond to the client
+    res.send({ message: "Order rejected", orderId: order._id });
+  } catch (error) {
+    console.error("Error rejecting order:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 

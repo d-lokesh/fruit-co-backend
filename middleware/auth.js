@@ -18,6 +18,7 @@ admin.initializeApp({
 
 module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
+  console.log("auth", authHeader);
   if (!authHeader) {
     console.log('No authorization header found');
     return res.status(401).send({ message: 'Unauthorized' });

@@ -8,9 +8,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const R_title = `Important: Your Order @ Fruit Co Was Rejected`;
-
 exports.sendOrderRejectedEmail = async (order) => {
+  // Determine email title and rejection message based on order type
+  const isSampleOrder = order.orderType === "sample";
+  const R_title = isSampleOrder
+    ? `❌ Your Sample Order @ Fruit Co Was Rejected`
+    : `❌ Your Subscription Plan @ Fruit Co Was Rejected`;
+
+  const rejectionMessage = isSampleOrder
+    ? `<b>We regret to inform you that your sample order at Fruit Co has been rejected.</b>`
+    : `<b>We regret to inform you that your subscription order at Fruit Co has been rejected.</b>`;
+
   const R_html = `
   <!DOCTYPE html>
   <html lang="en">
@@ -95,7 +103,7 @@ exports.sendOrderRejectedEmail = async (order) => {
         <h1>Order Rejected</h1>
       </div>
       <div class="order-details">
-        <b>We're sorry to inform you that your order at Fruit Co has been rejected. Here are the details:</b>
+        ${rejectionMessage}
         <table>
           <tr>
             <th>Detail</th>
@@ -128,7 +136,7 @@ exports.sendOrderRejectedEmail = async (order) => {
         </table>
         <div class="reason">
           <b>Reason for Rejection:</b>
-          <p>${order.moreInfo}</p>
+          <p>${order.moreInfo || "No additional details provided."}</p>
         </div>
       </div>
       <div class="footer">
