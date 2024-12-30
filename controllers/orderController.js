@@ -5,6 +5,11 @@ const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
 const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
 
 
+const {initializeWhatsAppClient, sendEnhancedWhatsAppMessage } = require('../utils/whatsapp/whatsapp'); // Import the WhatsApp utility
+
+
+
+
 
 const SampleOrder = require("../models/sampleOrderSchema");
 const SubscriptionOrder = require("../models/subscriptionOrderSchema");
@@ -48,6 +53,20 @@ exports.createOrder = async (req, res) => {
     // Send notifications
     await sendOrderPlacedEmail(savedOrder);
     await sendAdminNotificationEmail(savedOrder);
+
+    try {
+
+      await sendEnhancedWhatsAppMessage(
+        phone,
+        name,
+        plan,
+        deliveryDate,
+        orderType,
+        moreInfo      );
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+ 
 
     res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
   } catch (err) {
