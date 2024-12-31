@@ -24,12 +24,12 @@ app.use(express.json());
 // Routes
 app.use("/api/orders", orderRoutes);
 
-// Initialize WhatsApp Client when the server starts
-initializeWhatsAppClient().then(() => {
-  console.log('WhatsApp client initialized and ready!');
-}).catch(err => {
-  console.error('Error initializing WhatsApp client:', err);
-});
+// // Initialize WhatsApp Client when the server starts
+// initializeWhatsAppClient().then(() => {
+//   console.log('WhatsApp client initialized and ready!');
+// }).catch(err => {
+//   console.error('Error initializing WhatsApp client:', err);
+// });
 
 
 const PORT = process.env.PORT || 5000;
