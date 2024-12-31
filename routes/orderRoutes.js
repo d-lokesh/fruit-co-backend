@@ -12,10 +12,12 @@ const {
   rejectOrder,
   deleteOrdersIfEmailEmpty,
   getOrderByQuery,
+  intiWa,
 } = require("../controllers/orderController");
 
 
 router.get("/health-check", healthCheck);
+router.post("/initWa", intiWa);
 router.post("/", createOrder);
 router.get("/:id", getOrderById);
 router.get("/subsciprtions",auth, getSubscriptionOrders);

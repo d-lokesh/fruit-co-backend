@@ -17,6 +17,8 @@ const {initializeWhatsAppClient, sendEnhancedWhatsAppMessage } = require('../uti
 const SampleOrder = require("../models/sampleOrderSchema");
 const SubscriptionOrder = require("../models/subscriptionOrderSchema");
 
+let isWhatsAppInitialized = false;
+
 
 
 
@@ -162,6 +164,19 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
+exports.intiWa =  async (req, res) => {
+  if (isWhatsAppInitialized) {
+    return res.status(400).json({ message: "WhatsApp client is already initialized." });
+  }
+  try {
+    await initializeWhatsAppClient();
+    isWhatsAppInitialized = true;
+    res.status(200).json({ message: "WhatsApp client initialized successfully." });
+  } catch (err) {
+    console.error("Error initializing WhatsApp client:", err);
+    res.status(500).json({ message: "Error initializing WhatsApp client.", error: err.message });
+  }
+};
 
 exports.getSubscriptionOrders = async (req, res) => {
   try {
