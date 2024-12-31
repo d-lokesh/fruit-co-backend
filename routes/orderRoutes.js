@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth'); // Import the auth middleware
 
 const {
+  healthCheck,
   createOrder,
   getOrderById,
   getSubscriptionOrders,
@@ -13,6 +14,8 @@ const {
   getOrderByQuery,
 } = require("../controllers/orderController");
 
+
+router.get("/health-check", healthCheck);
 router.post("/", createOrder);
 router.get("/:id", getOrderById);
 router.get("/subsciprtions",auth, getSubscriptionOrders);

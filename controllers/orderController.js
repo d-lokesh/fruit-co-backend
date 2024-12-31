@@ -4,6 +4,9 @@ const {sendOrderRejectedEmail} = require("../utils/rejectOrder_email")
 const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
 const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
 
+const os = require("os");
+
+
 
 const {initializeWhatsAppClient, sendEnhancedWhatsAppMessage } = require('../utils/whatsapp/whatsapp'); // Import the WhatsApp utility
 
@@ -13,6 +16,63 @@ const {initializeWhatsAppClient, sendEnhancedWhatsAppMessage } = require('../uti
 
 const SampleOrder = require("../models/sampleOrderSchema");
 const SubscriptionOrder = require("../models/subscriptionOrderSchema");
+
+
+
+
+exports.healthCheck = async (req, res) => {
+  try {
+    // Check database connection status
+    const sampleOrderCount = await SampleOrder.countDocuments().exec();
+    const subscriptionOrderCount = await SubscriptionOrder.countDocuments().exec();
+
+    // Get system metrics
+    const memoryUsage = process.memoryUsage();
+    const totalMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    const usedMemory = totalMemory - freeMemory;
+    const cpuLoad = os.loadavg(); // [1-minute, 5-minute, 15-minute load average]
+
+    // Convert bytes to megabytes (MB)
+    const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+
+    res.status(200).json({
+      status: "Healthy",
+      uptime: process.uptime(),
+      dbConnection: "Connected",
+      sampleOrderCount,
+      subscriptionOrderCount,
+      systemMetrics: {
+        memoryUsage: {
+          rss: `${bytesToMB(memoryUsage.rss)} MB`, // Resident Set Size
+          heapTotal: `${bytesToMB(memoryUsage.heapTotal)} MB`,
+          heapUsed: `${bytesToMB(memoryUsage.heapUsed)} MB`,
+          external: `${bytesToMB(memoryUsage.external)} MB`,
+          arrayBuffers: `${bytesToMB(memoryUsage.arrayBuffers)} MB`,
+        },
+        memory: {
+          total: `${bytesToMB(totalMemory)} MB`,
+          free: `${bytesToMB(freeMemory)} MB`,
+          used: `${bytesToMB(usedMemory)} MB`,
+        },
+        cpuLoad: {
+          "1m": cpuLoad[0],
+          "5m": cpuLoad[1],
+          "15m": cpuLoad[2],
+        },
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "Unhealthy",
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+
+
 
 exports.createOrder = async (req, res) => {
   const { name, address, phone, email, plan, deliveryDate, orderType, moreInfo } = req.body;
