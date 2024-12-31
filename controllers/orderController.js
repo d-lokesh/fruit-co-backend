@@ -35,7 +35,7 @@ exports.healthCheck = async (req, res) => {
 
     // Convert bytes to megabytes (MB)
     const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
-
+    console.info("Healthy");
     res.status(200).json({
       status: "Healthy",
       uptime: process.uptime(),
@@ -64,6 +64,7 @@ exports.healthCheck = async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
+    console.error("Unhealthy");
     res.status(500).json({
       status: "Unhealthy",
       error: error.message,
