@@ -25,7 +25,6 @@ module.exports = async (req, res, next) => {
   }
 
   const idToken = authHeader.split(' ')[1];
-  console.log('Authorization token:', idToken);
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
