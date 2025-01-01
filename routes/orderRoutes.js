@@ -17,11 +17,12 @@ const {
 
 
 router.get("/health-check", healthCheck);
-router.post("/initWa", intiWa);
+router.get("/initWa", intiWa);
 router.post("/", createOrder);
-router.get("/:id", getOrderById);
 router.get("/subsciprtions",auth, getSubscriptionOrders);
 router.get("/samples",auth, getSampleOrders);
+router.get("/:id", getOrderById);
+
 router.patch("/:id/accept",auth, acceptOrder);
 router.patch("/:id/reject",auth, rejectOrder);
 router.delete('/deleteIfEmailEmpty',auth, deleteOrdersIfEmailEmpty); // Define the route
