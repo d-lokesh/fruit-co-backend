@@ -10,18 +10,35 @@ let whatsappClient;
 
 // Initialize WhatsApp Client
 
+
+
 const initializeWhatsAppClient = async () => {
   try {
-    if (fs.existsSync('./.wwebjs_auth/session/Default/chrome_debug.log')) {
-      fs.unlinkSync('./.wwebjs_auth/session/Default/chrome_debug.log'); // Delete file if possible
+    // Optional: Reset session storage
+    if (fs.existsSync('./.wwebjs_auth')) {
+      fs.rmSync('./.wwebjs_auth', { recursive: true });
     }
-    whatsappClient = new Client({
+
+    const whatsappClient = new Client({
       authStrategy: new LocalAuth(),
       puppeteer: { headless: true },
     });
 
+    whatsappClient.on('qr', (qr) => {
+      console.log('QR Code received:');
+      qrcode.generate(qr, { small: true });
+    });
+
     whatsappClient.on('ready', () => {
       console.log('WhatsApp client is ready!');
+    });
+
+    whatsappClient.on('authenticated', () => {
+      console.log('Client authenticated successfully!');
+    });
+
+    whatsappClient.on('auth_failure', (msg) => {
+      console.error('Authentication failed:', msg);
     });
 
     await whatsappClient.initialize();
@@ -29,6 +46,7 @@ const initializeWhatsAppClient = async () => {
     console.error('Error initializing WhatsApp client:', error);
   }
 };
+
 
 
 // Function to send a WhatsApp message with text and image
