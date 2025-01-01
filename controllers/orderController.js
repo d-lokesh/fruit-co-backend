@@ -118,17 +118,16 @@ exports.createOrder = async (req, res) => {
     await sendAdminNotificationEmail(savedOrder);
 
     try {
-
       await sendEnhancedWhatsAppMessage(
         savedOrder._id,
         phone,
         name,
         plan,
         deliveryDate,
-        orderType,
-              );
+        orderType
+      );
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error('Error sending WhatsApp message:', error.message);
     }
  
 

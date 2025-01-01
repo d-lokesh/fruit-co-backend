@@ -2,55 +2,53 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 
+let whatsappClient; // Global client instance
+let isClientReady = false; // Track if the client is ready
 
-// Define the image path for use in the message
-const imagePath = './dfc.png'; // Path to the image to send
-
-let whatsappClient;
-
-// Initialize WhatsApp Client // pre prod
-
-
-
+// Initialize WhatsApp Client
 const initializeWhatsAppClient = async () => {
-  try {
-    // Optional: Reset session storage
-    if (fs.existsSync('./.wwebjs_auth')) {
-      fs.rmSync('./.wwebjs_auth', { recursive: true });
-    }
-
-    const whatsappClient = new Client({
-      authStrategy: new LocalAuth(),
-      puppeteer: { headless: true },
-    });
-
-    whatsappClient.on('qr', (qr) => {
-      console.log('QR Code received:');
-      qrcode.generate(qr, { small: true });
-    });
-
-    whatsappClient.on('ready', () => {
-      console.log('WhatsApp client is ready!');
-    });
-
-    whatsappClient.on('authenticated', () => {
-      console.log('Client authenticated successfully!');
-    });
-
-    whatsappClient.on('auth_failure', (msg) => {
-      console.error('Authentication failed:', msg);
-    });
-
-    await whatsappClient.initialize();
-  } catch (error) {
-    console.error('Error initializing WhatsApp client:', error);
+  if (whatsappClient) {
+    console.log('WhatsApp client already initialized.');
+    return;
   }
+
+  whatsappClient = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: { headless: true },
+  });
+
+  whatsappClient.on('qr', (qr) => {
+    console.log('QR Code received:');
+    qrcode.generate(qr, { small: true });
+  });
+
+  whatsappClient.on('ready', () => {
+    console.log('WhatsApp client is ready!');
+    isClientReady = true;
+  });
+
+  whatsappClient.on('authenticated', () => {
+    console.log('Client authenticated successfully!');
+  });
+
+  whatsappClient.on('auth_failure', (msg) => {
+    console.error('Authentication failed:', msg);
+  });
+
+  await whatsappClient.initialize();
 };
 
-
+// Function to check if the client is ready
+const getWhatsAppClient = () => {
+  if (!whatsappClient || !isClientReady) {
+    throw new Error('WhatsApp client is not initialized or ready.');
+  }
+  return whatsappClient;
+};
 
 // Function to send a WhatsApp message with text and image
-const sendEnhancedWhatsAppMessage = async (orderId,phone, name, plan, deliveryDate, orderType) => {
+const sendEnhancedWhatsAppMessage = async (orderId, phone, name, plan, deliveryDate, orderType) => {
+  const client = getWhatsAppClient(); // Use the initialized client
   const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
 
   const whatsappMessage = `
@@ -69,21 +67,11 @@ const sendEnhancedWhatsAppMessage = async (orderId,phone, name, plan, deliveryDa
   Best regards,  
   The Daily Fruit Co Team 🍎
   `;
-  
 
   try {
-    // Send the text message
-    // await whatsappClient.sendMessage(formattedPhone, whatsappMessage);
-    // console.log('Text message sent successfully');
-
-    // If an image is provided, send it
-    if (imagePath) {
-      const media = MessageMedia.fromFilePath(imagePath); // Load the image from the given path
-      await whatsappClient.sendMessage(formattedPhone, media, {
-        caption: whatsappMessage,
-      });
-      console.log('Image sent successfully');
-    }
+    const media = MessageMedia.fromFilePath('./dfc.png'); // Path to your image
+    await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
+    console.log('Image sent successfully');
   } catch (error) {
     console.error('Failed to send WhatsApp message or image:', error);
     throw new Error('Message sending failed');
