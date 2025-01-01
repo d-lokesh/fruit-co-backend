@@ -55,17 +55,16 @@ const sendEnhancedWhatsAppMessage = async (orderId, phone, name, plan, deliveryD
   Hello ${name},
   
   We’re excited to have you as our valued customer! 🎉
-  
   Your order(Order ID: ${orderId}) has been successfully placed and is currently under review. Here are your order details:
   
   🌟 Plan: ${plan}  
   📅 Delivery Date: ${deliveryDate}  
   📦 Order Type: ${orderType}
   
-  Thank you for choosing Daily Fruit Co. We’ll notify you once your order is confirmed and ready for delivery!
+Thank you for choosing Daily Fruit Co. We’ll notify you once your order is confirmed and ready for delivery!
   
-  Best regards,  
-  The Daily Fruit Co Team 🍎
+Best regards,  
+The Daily Fruit Co Team 🍎
   `;
 
   try {

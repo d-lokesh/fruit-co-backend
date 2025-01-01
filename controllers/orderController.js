@@ -83,9 +83,12 @@ exports.createOrder = async (req, res) => {
   try {
     let savedOrder;
 
+    orderId = generateOrderId(phone);
+
     if (orderType === "sample") {
       // Save to SampleOrder collection
       const newSampleOrder = new SampleOrder({
+        orderId,
         name,
         address,
         phone,
@@ -99,6 +102,7 @@ exports.createOrder = async (req, res) => {
     } else if (orderType === "subscription") {
       // Save to SubscriptionOrder collection
       const newSubscriptionOrder = new SubscriptionOrder({
+        orderId,
         name,
         address,
         phone,
@@ -119,7 +123,7 @@ exports.createOrder = async (req, res) => {
 
     try {
       await sendEnhancedWhatsAppMessage(
-        savedOrder._id,
+        savedOrder.orderId,
         phone,
         name,
         plan,
@@ -142,13 +146,30 @@ exports.createOrder = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
+    let filter = {};
+
+// Check which query parameter is passed and build the filter accordingly
+if (id) {
+  if (id.length === 10) {
+    // If the id is 10 digits, it's likely a phone number
+    filter.phone = id;
+  } else if (id.startsWith('ODFC')) {
+    // If the id starts with "ODFC", it's likely an orderId
+    filter.orderId = id;
+  } else {
+    // Otherwise, assume it's an _id (Mongoose ID)
+    filter._id = id;
+  }
+}
+
+
 
     // First, try finding the order in the SampleOrder model
-    let order = await SampleOrder.findById(id);
+    let order = await SampleOrder.findOne(filter);
 
     // If not found in SampleOrder, try finding it in SubscriptionOrder
     if (!order) {
-      order = await SubscriptionOrder.findById(id);
+      order = await SubscriptionOrder.findOne(filter);
     }
 
     // If not found in either, return 404
@@ -197,10 +218,11 @@ exports.getSampleOrders = async (req, res) => {
 
 exports.acceptOrder = async (req, res) => {
   try {
-    const { id, orderType } = req.params; // Assuming `orderType` is passed in the request
+    const { id } = req.params; // Extract the ID from the URL
+    const { orderType } = req.body; // Extract the orderType from the request body
 
     let order;
-
+    console.log("oderid and type", id, orderType);
     // Determine which model to query based on `orderType`
     if (orderType === "sample") {
       order = await SampleOrder.findById(id);
@@ -233,8 +255,9 @@ exports.acceptOrder = async (req, res) => {
 
 exports.rejectOrder = async (req, res) => {
   try {
-    const { id, orderType } = req.params; // Assuming `orderType` is passed in the request
-    const { reason } = req.body; // Capture rejection reason
+    const { id } = req.params; // Assuming `orderType` is passed in the request
+    const { reason,orderType } = req.body; // Capture rejection reason
+
 
     let order;
 
@@ -293,7 +316,6 @@ exports.rejectOrder = async (req, res) => {
     }
   };
   exports.getOrderByQuery = async (req, res) => {
-    console.log("started");
     const { query } = req.query;
     console.log("end");
     // Check if query parameter is provided
@@ -332,5 +354,14 @@ exports.rejectOrder = async (req, res) => {
       console.error('Error fetching order:', error);
       res.status(500).json({ error: 'An error occurred while processing the request' });
     }
+  };
+
+  const generateOrderId = (phone) => {
+    const currentDate = new Date();
+    const day = String(currentDate.getDate()).padStart(2, '0'); // Get day of the month, ensure 2 digits
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get month (0-11), ensure 2 digits
+    const lastFourDigits = phone.slice(-4); // Get the last four digits of the phone number
+    
+    return `ODFC${day}${month}${lastFourDigits}`; // Format orderId as ODFC-DDMM-XXXX
   };
   

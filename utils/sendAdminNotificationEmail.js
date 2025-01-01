@@ -101,7 +101,7 @@ exports.sendAdminNotificationEmail = async (order) => {
           </tr>
           <tr>
             <td>OrderId</td>
-            <td>${order._id}</td>
+            <td>${order.orderId}</td>
           </tr>
           <tr>
             <td>Name</td>

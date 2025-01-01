@@ -19,7 +19,7 @@ const {
 router.get("/health-check", healthCheck);
 router.get("/initWa", intiWa);
 router.post("/", createOrder);
-router.get("/subsciprtions",auth, getSubscriptionOrders);
+router.get("/subscriptions",auth, getSubscriptionOrders);
 router.get("/samples",auth, getSampleOrders);
 router.get("/:id", getOrderById);
 
