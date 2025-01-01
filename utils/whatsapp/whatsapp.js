@@ -8,7 +8,7 @@ const imagePath = './dfc.png'; // Path to the image to send
 
 let whatsappClient;
 
-// Initialize WhatsApp Client
+// Initialize WhatsApp Client // pre prod
 
 
 
