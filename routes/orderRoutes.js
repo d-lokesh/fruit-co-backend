@@ -25,7 +25,7 @@ router.get("/:id", getOrderById);
 
 router.patch("/:id/accept",auth, acceptOrder);
 router.patch("/:id/reject",auth, rejectOrder);
-router.delete('/deleteIfEmailEmpty',auth, deleteOrdersIfEmailEmpty); // Define the route
+router.delete('/deleteIfEmailEmpty', deleteOrdersIfEmailEmpty); // Define the route
 router.get('/orderData', getOrderByQuery);
 
 

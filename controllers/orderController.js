@@ -185,9 +185,9 @@ if (id) {
 };
 
 exports.intiWa =  async (req, res) => {
-  if (isWhatsAppInitialized) {
-    return res.status(400).json({ message: "WhatsApp client is already initialized." });
-  }
+  // if (isWhatsAppInitialized) {
+  //   return res.status(400).json({ message: "WhatsApp client is already initialized." });
+  // }
   try {
     await initializeWhatsAppClient();
     isWhatsAppInitialized = true;
@@ -301,13 +301,24 @@ exports.rejectOrder = async (req, res) => {
 
   exports.deleteOrdersIfEmailEmpty = async (req, res) => {
     try {
-      const ordersToDelete = await Order.find({ email: { $in: ['', null] } });
+      // const ordersToDelete = await Order.find({ email: { $in: ['', null] } });
   
-      if (ordersToDelete.length === 0) {
-        return res.status(404).send({ message: "No orders with empty email found" });
-      }
+      // if (ordersToDelete.length === 0) {
+      //   return res.status(404).send({ message: "No orders with empty email found" });
+      // }
   
-      await Order.deleteMany({ email: { $in: ['', null] } });
+      // await Order.deleteMany({ email: { $in: ['', null] } });
+
+
+      const phoneNumber = '7995830577'; // Specify the phone number to delete orders
+
+const ordersToDelete = await SubscriptionOrder.find({ phone: phoneNumber });
+
+if (ordersToDelete.length === 0) {
+  return res.status(404).send({ message: "No orders with the specified phone number found" });
+}
+
+await SubscriptionOrder.deleteMany({ phone: phoneNumber });
   
       res.send({ message: `${ordersToDelete.length} orders deleted because email is empty` });
     } catch (error) {

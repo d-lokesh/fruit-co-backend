@@ -9,9 +9,14 @@ let isClientReady = false; // Track if the client is ready
 const initializeWhatsAppClient = async () => {
   if (whatsappClient) {
     console.log('WhatsApp client already initialized.');
+    whatsappClient.on('ready', () => {
+      console.log('WhatsApp client is ready!');
+      isClientReady = true;
+    });
+  
     return;
   }
-
+console.log("hitting");
   whatsappClient = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: { headless: true },
@@ -30,6 +35,7 @@ const initializeWhatsAppClient = async () => {
   whatsappClient.on('authenticated', () => {
     console.log('Client authenticated successfully!');
   });
+
 
   whatsappClient.on('auth_failure', (msg) => {
     console.error('Authentication failed:', msg);
