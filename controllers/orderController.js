@@ -92,21 +92,22 @@ exports.getOrderById = async (req, res) => {
     const { id } = req.params;
     let filter = {};
 
-// Check which query parameter is passed and build the filter accordingly
-if (id) {
-  if (id.length === 10) {
-    // If the id is 10 digits, it's likely a phone number
-    filter.phone = id;
-  } else if (id.startsWith('ODFC')) {
-    // If the id starts with "ODFC", it's likely an orderId
-    filter.orderId = id;
-  } else {
-    // Otherwise, assume it's an _id (Mongoose ID)
-    filter._id = id;
-  }
-}
-
-
+    // Check which query parameter is passed and build the filter accordingly
+    if (id) {
+      if (id.length === 10) {
+        // If the id is 10 digits, it's likely a phone number
+        filter.phone = id;
+      } else if (/^odfc/i.test(id)) {
+        // If the id starts with "ODFC" (case-insensitive), it's likely an orderId
+        filter.orderId = new RegExp(`^${id}`, 'i');
+      } else if(id.length === 24){
+        // Otherwise, assume it's an _id (Mongoose ID)
+        filter._id = id;
+      }
+      else{
+        filter.phone = id;
+      }
+    }
 
     // First, try finding the order in the SampleOrder model
     let order = await SampleOrder.findOne(filter);
@@ -124,9 +125,11 @@ if (id) {
     // Return the found order
     res.status(200).json(order);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 exports.intiWa =  async (req, res) => {
   // if (isWhatsAppInitialized) {
@@ -313,12 +316,13 @@ await SubscriptionOrder.deleteMany({ phone: phoneNumber });
 
   const generateOrderId = (phone) => {
     const currentDate = new Date();
-    const day = String(currentDate.getDate()).padStart(2, '0'); // Get day of the month, ensure 2 digits
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get month (0-11), ensure 2 digits
+    const minutes = String(currentDate.getMinutes()).padStart(2, '0'); // Get minutes, ensure 2 digits
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0'); // Get seconds, ensure 2 digits
     const lastFourDigits = phone.slice(-4); // Get the last four digits of the phone number
     
-    return `ODFC${day}${month}${lastFourDigits}`; // Format orderId as ODFC-DDMM-XXXX
-  };
+    return `ODFC${minutes}${seconds}${lastFourDigits}`; // Format orderId as ODFC-MMSS-XXXX
+};
+
 
 
   
@@ -327,6 +331,8 @@ exports.healthCheck = async (req, res) => {
     // Check database connection status
     const sampleOrderCount = await SampleOrder.countDocuments().exec();
     const subscriptionOrderCount = await SubscriptionOrder.countDocuments().exec();
+    await initializeWhatsAppClient();
+
 
     // Get system metrics
     const memoryUsage = process.memoryUsage();
