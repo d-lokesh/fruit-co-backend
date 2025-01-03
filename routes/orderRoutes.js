@@ -4,6 +4,7 @@ const auth = require('../middleware/auth'); // Import the auth middleware
 
 const {
   healthCheck,
+  dummyHealthCheck,
   createOrder,
   getOrderById,
   getSubscriptionOrders,
@@ -17,6 +18,7 @@ const {
 
 
 router.get("/health-check", healthCheck);
+router.get("/dummy-health-check", dummyHealthCheck);
 router.get("/initWa", intiWa);
 router.post("/", createOrder);
 router.get("/subscriptions",auth, getSubscriptionOrders);
