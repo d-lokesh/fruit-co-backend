@@ -91,8 +91,7 @@ const retrieveSessionFromS3 = async (downloadDirectory) => {
     return true;
 
   } catch (error) {
-    console.error('Error retrieving session directory from S3:', error);
-    fs.unlinkSync(zipFilePath);
+    console.error('Error retrieving session directory from S3:');
     return false;
   }
 };
