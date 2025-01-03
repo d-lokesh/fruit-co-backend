@@ -3,6 +3,8 @@ const { sendOrderPlacedEmail } = require("../utils/email");
 const {sendOrderRejectedEmail} = require("../utils/rejectOrder_email")
 const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
 const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+
 
 const os = require("os");
 
@@ -397,14 +399,14 @@ exports.dummyHealthCheck = async (req,res) =>{
   
 const senddummymessage = async () => {
   const client = getWhatsAppClient(); // Use the initialized client
-  const formattedPhone = phone.startsWith('91') ? `${7995830577}@c.us` : `91${7995830577}@c.us`;
+  const formattedPhone = "7995830577".startsWith('91') ? `${7995830577}@c.us` : `91${7995830577}@c.us`;
 
   const whatsappMessage = `test message`;
 
   try {
     const media = MessageMedia.fromFilePath('./dfc.png'); // Path to your image
     await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
-    console.log('Image sent successfully');
+    console.log('whatsapp message with Image sent successfully');
   } catch (error) {
     console.error('Failed to send WhatsApp message or image:', error);
     throw new Error('Message sending failed');
