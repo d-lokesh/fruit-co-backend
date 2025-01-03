@@ -2,7 +2,8 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
-const { uploadSessionToS3 , retrieveSessionFromS3 } = require('./s3Service'); // Import S3 service
+
+const { uploadSessionToS3 , retrieveSessionFromS3 } = require('./awsService'); // Import S3 service
 
 let whatsappClient;
 let isClientReady = false;
