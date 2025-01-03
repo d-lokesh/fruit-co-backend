@@ -12,6 +12,9 @@ const {initializeWhatsAppClient,  } = require('../utils/whatsapp/whatsappClient'
 
 const {sendEnhancedWhatsAppMessage} =  require('../utils/whatsapp/whatsapp');
 
+const { getWhatsAppClient } = require('../utils/whatsapp/whatsappClient'); // Import getClient function
+
+
 
 
 
@@ -331,8 +334,7 @@ exports.healthCheck = async (req, res) => {
     // Check database connection status
     const sampleOrderCount = await SampleOrder.countDocuments().exec();
     const subscriptionOrderCount = await SubscriptionOrder.countDocuments().exec();
-    await initializeWhatsAppClient();
-
+    senddummymessage();
 
     // Get system metrics
     const memoryUsage = process.memoryUsage();
@@ -393,3 +395,18 @@ exports.dummyHealthCheck = async (req,res) =>{
 
 }
   
+const senddummymessage = async () => {
+  const client = getWhatsAppClient(); // Use the initialized client
+  const formattedPhone = phone.startsWith('91') ? `${7995830577}@c.us` : `91${7995830577}@c.us`;
+
+  const whatsappMessage = `test message`;
+
+  try {
+    const media = MessageMedia.fromFilePath('./dfc.png'); // Path to your image
+    await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
+    console.log('Image sent successfully');
+  } catch (error) {
+    console.error('Failed to send WhatsApp message or image:', error);
+    throw new Error('Message sending failed');
+  }
+};
