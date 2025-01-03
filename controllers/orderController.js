@@ -8,8 +8,9 @@ const os = require("os");
 
 
 
-const {initializeWhatsAppClient, sendEnhancedWhatsAppMessage } = require('../utils/whatsapp/whatsapp'); // Import the WhatsApp utility
+const {initializeWhatsAppClient,  } = require('../utils/whatsapp/whatsappClient'); // Import the WhatsApp utility
 
+const {sendEnhancedWhatsAppMessage} =  require('../utils/whatsapp/whatsapp');
 
 
 
