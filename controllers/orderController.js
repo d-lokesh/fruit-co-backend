@@ -68,20 +68,20 @@ exports.createOrder = async (req, res) => {
 
     // Send notifications
     await sendOrderPlacedEmail(savedOrder);
-    // await sendAdminNotificationEmail(savedOrder);
+    await sendAdminNotificationEmail(savedOrder);
 
-    try {
-      await sendEnhancedWhatsAppMessage(
-        savedOrder.orderId,
-        phone,
-        name,
-        plan,
-        deliveryDate,
-        orderType
-      );
-    } catch (error) {
-      console.error('Error sending WhatsApp message:', error.message);
-    }
+    // try {
+    //   await sendEnhancedWhatsAppMessage(
+    //     savedOrder.orderId,
+    //     phone,
+    //     name,
+    //     plan,
+    //     deliveryDate,
+    //     orderType
+    //   );
+    // } catch (error) {
+    //   console.error('Error sending WhatsApp message:', error.message);
+    // }
  
 
     res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
