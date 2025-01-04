@@ -68,7 +68,7 @@ exports.createOrder = async (req, res) => {
 
     // Send notifications
     await sendOrderPlacedEmail(savedOrder);
-    await sendAdminNotificationEmail(savedOrder);
+    // await sendAdminNotificationEmail(savedOrder);
 
     try {
       await sendEnhancedWhatsAppMessage(
@@ -336,7 +336,7 @@ exports.healthCheck = async (req, res) => {
     // Check database connection status
     const sampleOrderCount = await SampleOrder.countDocuments().exec();
     const subscriptionOrderCount = await SubscriptionOrder.countDocuments().exec();
-    senddummymessage();
+    // senddummymessage();
 
     // Get system metrics
     const memoryUsage = process.memoryUsage();
