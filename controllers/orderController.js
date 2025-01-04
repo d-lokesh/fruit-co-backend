@@ -70,18 +70,18 @@ exports.createOrder = async (req, res) => {
     await sendOrderPlacedEmail(savedOrder);
     await sendAdminNotificationEmail(savedOrder);
 
-    // try {
-    //   await sendEnhancedWhatsAppMessage(
-    //     savedOrder.orderId,
-    //     phone,
-    //     name,
-    //     plan,
-    //     deliveryDate,
-    //     orderType
-    //   );
-    // } catch (error) {
-    //   console.error('Error sending WhatsApp message:', error.message);
-    // }
+    try {
+      await sendEnhancedWhatsAppMessage(
+        savedOrder.orderId,
+        phone,
+        name,
+        plan,
+        deliveryDate,
+        orderType
+      );
+    } catch (error) {
+      console.error('Error sending WhatsApp message:', error.message);
+    }
  
 
     res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
@@ -336,7 +336,7 @@ exports.healthCheck = async (req, res) => {
     // Check database connection status
     const sampleOrderCount = await SampleOrder.countDocuments().exec();
     const subscriptionOrderCount = await SubscriptionOrder.countDocuments().exec();
-    // senddummymessage();
+    senddummymessage();
 
     // Get system metrics
     const memoryUsage = process.memoryUsage();
