@@ -5,6 +5,8 @@ const { awsConfig } = require('../../config/config');
 const AWS = require('aws-sdk'); // Import AWS SDK
 const fsExtra = require('fs-extra'); // To copy directories
 const archiver = require('archiver');
+const logger = require('../../logger');  // Import the logger
+
 
 // Initialize the AWS S3 instance
 const s3 = new AWS.S3({
@@ -20,7 +22,7 @@ const uploadSessionToS3 = async ( sessionDirectory) => {
 
   try {
     // Step 1: Copy the session directory to a temporary folder
-    console.log('Copying session directory to a temporary location...');
+    logger.info('Copying session directory to a temporary location...');
     fsExtra.copySync(sessionDirectory, tempDirectory);
 
     // Step 2: Compress the session directory into a .zip file
@@ -31,7 +33,7 @@ const uploadSessionToS3 = async ( sessionDirectory) => {
     archive.pipe(output);
     await archive.finalize();
 
-    console.log('Session directory compressed successfully.');
+    logger.info('Session directory compressed successfully.');
 
     // Step 3: Read the .zip file and upload it to S3
     const zipFile = fs.readFileSync(zipFilePath);
@@ -44,7 +46,7 @@ const uploadSessionToS3 = async ( sessionDirectory) => {
     };
 
     await s3.upload(params).promise();
-    console.log('Session directory uploaded successfully to S3.');
+    logger.info('Session directory uploaded successfully to S3.');
 
     // Step 4: Clean up local files
     fs.unlinkSync(zipFilePath);
@@ -71,7 +73,7 @@ const retrieveSessionFromS3 = async (downloadDirectory) => {
 
     // Save the .zip file locally
     fs.writeFileSync(zipFilePath, data.Body);
-    console.log('Session .zip file downloaded successfully from S3.');
+    logger.info('Session .zip file downloaded successfully from S3.');
 
     // Verify file integrity (check size)
     const downloadedFileSize = fs.statSync(zipFilePath).size;
@@ -84,7 +86,7 @@ const retrieveSessionFromS3 = async (downloadDirectory) => {
       .pipe(unzipper.Extract({ path: downloadDirectory }))
       .promise();
 
-    console.log('Session directory extracted successfully.');
+    logger.info('Session directory extracted successfully.');
 
     // Clean up local .zip file
     fs.unlinkSync(zipFilePath);

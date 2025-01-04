@@ -2,6 +2,8 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
+const logger = require('../../logger');  // Import the logger
+
 
 const { uploadSessionToS3 , retrieveSessionFromS3 } = require('./awsService'); // Import S3 service
 
@@ -15,23 +17,23 @@ const sessionDirectory = path.resolve(__dirname, '../../.wwebjs_auth'); // Direc
 const initializeWhatsAppClient = async () => {
   try {
     // Ensure the session directory exists
-    if (!fs.existsSync(sessionDirectory)) {
-      fs.mkdirSync(sessionDirectory, { recursive: true });
-    }
+    // if (!fs.existsSync(sessionDirectory)) {
+    //   fs.mkdirSync(sessionDirectory, { recursive: true });
+    // }
 
-    // Check if session exists locally
-    if (fs.existsSync(path.join(sessionDirectory, 'Default'))) {
-      console.log('Local session directory exists. Using it...');
-    } else {
-      console.log(`Local session directory not found. Checking S3...and trying place session at ${sessionDirectory}`);
-      const sessionRetrieved = await retrieveSessionFromS3(sessionDirectory);
+    // // Check if session exists locally
+    // if (fs.existsSync(path.join(sessionDirectory, 'Default'))) {
+    //   logger.info('Local session directory exists. Using it...');
+    // } else {
+    //   logger.info(`Local session directory not found. Checking S3...and trying place session at ${sessionDirectory}`);
+    //   const sessionRetrieved = await retrieveSessionFromS3(sessionDirectory);
 
-      console.log("sesssion retrived",sessionRetrieved);
+    //   logger.info("sesssion retrived",sessionRetrieved);
 
-      if (!sessionRetrieved) {
-        console.log('No valid session found in S3. Creating a new session...');
-      }
-    }
+    //   if (!sessionRetrieved) {
+    //     logger.info('No valid session found in S3. Creating a new session...');
+    //   }
+    // }
 
     // Initialize WhatsApp client
     whatsappClient = new Client({
@@ -54,12 +56,12 @@ const initializeWhatsAppClient = async () => {
   const setupEventListeners = (client) => {
     client.on('qr', (qr) => {
       try {
-        console.log('QR Code received. Generating link...');
+        logger.info('QR Code received. Generating link...');
   
         // Generate the QR code URL using a public API
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qr)}&size=200x200`;
   
-        console.log('QR Code URL:', qrUrl); // This will print the QR code link to the console
+        logger.info('QR Code URL:', qrUrl); // This will print the QR code link to the console
       
       } catch (error) {
         console.error('Error generating QR code URL:', error);
@@ -67,15 +69,15 @@ const initializeWhatsAppClient = async () => {
     });
 
   client.on('authenticated', async () => {
-    console.log('Client authenticated successfully!');
-    console.log('Waiting for session files to be ready...');
+    logger.info('Client authenticated successfully!');
+    logger.info('Waiting for session files to be ready...');
     await delay(50000); // Add a small delay to ensure files are ready
-    console.log('Uploading session directory to S3...');
+    logger.info('Uploading session directory to S3...');
     await uploadSessionToS3(sessionDirectory);
   });
 
   client.on('ready', () => {
-    console.log('WhatsApp client is ready!');
+    logger.info('WhatsApp client is ready!');
     isClientReady = true;
   });
 

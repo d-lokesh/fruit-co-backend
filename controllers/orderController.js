@@ -5,6 +5,9 @@ const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
 const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 
+const logger = require('../logger');  // Import the logger
+
+
 
 const os = require("os");
 
@@ -130,7 +133,7 @@ exports.getOrderById = async (req, res) => {
     // Return the found order
     res.status(200).json(order);
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -174,7 +177,7 @@ exports.acceptOrder = async (req, res) => {
     const { orderType } = req.body; // Extract the orderType from the request body
 
     let order;
-    console.log("oderid and type", id, orderType);
+    logger.info("oderid and type", id, orderType);
     // Determine which model to query based on `orderType`
     if (orderType === "sample") {
       order = await SampleOrder.findById(id);
@@ -199,7 +202,7 @@ exports.acceptOrder = async (req, res) => {
     // Send an email notification
     await sendOrderAcceptedEmail(order);
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -238,7 +241,7 @@ exports.rejectOrder = async (req, res) => {
     try {
       await sendOrderRejectedEmail(order);
     } catch (emailError) {
-      console.log("Error sending rejection email:", emailError);
+      logger.info("Error sending rejection email:", emailError);
     }
 
     // Respond to the client
@@ -274,19 +277,19 @@ await SubscriptionOrder.deleteMany({ phone: phoneNumber });
   
       res.send({ message: `${ordersToDelete.length} orders deleted because email is empty` });
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       res.status(500).json({ error: 'An error occurred while processing the request' });
     }
   };
   exports.getOrderByQuery = async (req, res) => {
     const { query } = req.query;
-    console.log("end");
+    logger.info("end");
     // Check if query parameter is provided
     if (!query) {
       return res.status(400).send({ message: 'Query parameter is required' });
     }
   
-    console.log('Received query:', query);
+    logger.info('Received query:', query);
   
     try {
       // Check if query is a valid ObjectId
@@ -406,7 +409,7 @@ const senddummymessage = async () => {
   try {
     const media = MessageMedia.fromFilePath('./dfc.png'); // Path to your image
     await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
-    console.log('whatsapp message with Image sent successfully');
+    logger.info('whatsapp message with Image sent successfully');
   } catch (error) {
     console.error('Failed to send WhatsApp message or image:', error);
     throw new Error('Message sending failed');

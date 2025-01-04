@@ -1,5 +1,7 @@
 const admin = require('firebase-admin');
 require('dotenv').config();
+const logger = require('../logger');  // Import the logger
+
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -19,7 +21,7 @@ admin.initializeApp({
 module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    console.log('No authorization header found');
+    logger.info('No authorization header found');
     return res.status(401).send({ message: 'Unauthorized' });
   }
 
@@ -28,10 +30,10 @@ module.exports = async (req, res, next) => {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     req.user = decodedToken;
-    // console.log('Token verified:', decodedToken);
+    // logger.info('Token verified:', decodedToken);
     next();
   } catch (error) {
-    console.log('Error verifying token:', error);
+    logger.info('Error verifying token:', error);
     return res.status(401).send({ message: 'Unauthorized' });
   }
 };

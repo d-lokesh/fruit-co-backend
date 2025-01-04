@@ -5,6 +5,9 @@ const connectDB = require("./config/db");
 const orderRoutes = require("./routes/orderRoutes");
 const { initializeWhatsAppClient } = require('./utils/whatsapp/whatsappClient'); // Import the WhatsApp utility
 
+const logger = require('./logger');  // Import the logger
+
+
 dotenv.config();
 connectDB();
 
@@ -37,7 +40,7 @@ console.error('Error initializing WhatsApp client:', error);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });
 
 // Serverless Handler for Vercel

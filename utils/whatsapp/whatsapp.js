@@ -2,6 +2,8 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const { getWhatsAppClient } = require('./whatsappClient'); // Import getClient function
+const logger = require('../../logger');  // Import the logger
+
 
 
 // Declare the client variable first
@@ -12,15 +14,15 @@ let isClientReady = false; // Track if the client is ready
 // Initialize WhatsApp Client
 const initializeWhatsAppClient = async () => {
   if (whatsappClient) {
-    console.log('WhatsApp client already initialized.');
+    logger.info('WhatsApp client already initialized.');
     whatsappClient.on('ready', () => {
-      console.log('WhatsApp client is ready!');
+      logger.info('WhatsApp client is ready!');
       isClientReady = true;
     });
     return;
   }
 
-  console.log("Initializing WhatsApp client...");
+  logger.info("Initializing WhatsApp client...");
 
   // Initialize whatsappClient here, after declaring the variable
   whatsappClient = new Client({
@@ -29,17 +31,17 @@ const initializeWhatsAppClient = async () => {
   });
 
   whatsappClient.on('qr', (qr) => {
-    console.log('QR Code received:');
+    logger.info('QR Code received:');
     qrcode.generate(qr, { small: true });
   });
 
   whatsappClient.on('ready', () => {
-    console.log('WhatsApp client is ready!');
+    logger.info('WhatsApp client is ready!');
     isClientReady = true;
   });
 
   whatsappClient.on('authenticated', () => {
-    console.log('Client authenticated successfully!');
+    logger.info('Client authenticated successfully!');
   });
 
   whatsappClient.on('auth_failure', (msg) => {
@@ -67,7 +69,7 @@ const sendEnhancedWhatsAppMessage = async (orderId, phone, name, plan, deliveryD
   try {
     const media = MessageMedia.fromFilePath('./dfc.png'); // Path to your image
     await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
-    console.log('Image sent successfully');
+    logger.info('Image sent successfully');
   } catch (error) {
     console.error('Failed to send WhatsApp message or image:', error);
     throw new Error('Message sending failed');
