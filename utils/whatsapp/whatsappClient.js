@@ -36,7 +36,10 @@ const initializeWhatsAppClient = async () => {
     // Initialize WhatsApp client
     whatsappClient = new Client({
       authStrategy: new LocalAuth({ dataPath: sessionDirectory }),
-      puppeteer: { headless: true },
+      puppeteer: {
+        headless: true, // Ensure headless mode is enabled
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Add these flags to fix root user issue
+      },
     });
 
     setupEventListeners(whatsappClient);
