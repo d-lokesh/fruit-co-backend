@@ -333,13 +333,14 @@ await SubscriptionOrder.deleteMany({ phone: phoneNumber });
 
 
 
-  
+
 exports.healthCheck = async (req, res) => {
   try {
-    // Check database connection status
+
+    senddummymessage()
+        // Check database connection status
     const sampleOrderCount = await SampleOrder.countDocuments().exec();
     const subscriptionOrderCount = await SubscriptionOrder.countDocuments().exec();
-    senddummymessage();
 
     // Get system metrics
     const memoryUsage = process.memoryUsage();
@@ -350,24 +351,25 @@ exports.healthCheck = async (req, res) => {
 
     // Convert bytes to megabytes (MB)
     const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
-    const metrics = `{
-      status: "Healthy",
+
+    const metrics = {
+      status: 'Healthy',
       uptime: process.uptime(),
-      dbConnection: "Connected",
+      dbConnection: 'Connected',
       sampleOrderCount,
       subscriptionOrderCount,
       systemMetrics: {
         memoryUsage: {
-          rss: ${bytesToMB(memoryUsage.rss)} MB,
-          heapTotal: ${bytesToMB(memoryUsage.heapTotal)} MB,
-          heapUsed: ${bytesToMB(memoryUsage.heapUsed)} MB,
-          external: ${bytesToMB(memoryUsage.external)} MB,
-          arrayBuffers: ${bytesToMB(memoryUsage.arrayBuffers)} MB,
+          rss: `${bytesToMB(memoryUsage.rss)} MB`,
+          heapTotal: `${bytesToMB(memoryUsage.heapTotal)} MB`,
+          heapUsed: `${bytesToMB(memoryUsage.heapUsed)} MB`,
+          external: `${bytesToMB(memoryUsage.external)} MB`,
+          arrayBuffers: `${bytesToMB(memoryUsage.arrayBuffers)} MB`,
         },
         memory: {
-          total: ${bytesToMB(totalMemory)} MB,
-          free: ${bytesToMB(freeMemory)} MB,
-          used: ${bytesToMB(usedMemory)} MB,
+          total: `${bytesToMB(totalMemory)} MB`,
+          free: `${bytesToMB(freeMemory)} MB`,
+          used: `${bytesToMB(usedMemory)} MB`,
         },
         cpuLoad: {
           "1m": cpuLoad[0],
@@ -376,21 +378,28 @@ exports.healthCheck = async (req, res) => {
         },
       },
       timestamp: new Date().toISOString(),
-    }`;
+    };
 
-    console.info("---------Hourly Service Metrics---------");
-    console.info(metrics);
+    // Log the metrics to the console
+    logger.info("--------- Hourly Service Metrics ---------");
+    logger.info(JSON.stringify(metrics, null, 2)); // Prettify the JSON log
 
+    // Send the metrics as JSON response
     res.status(200).json(metrics);
+
   } catch (error) {
-    console.error("Unhealthy");
+    // Log the error with timestamp
+    logger.error("Unhealthy: " + error.message);
+
+    // Send error response
     res.status(500).json({
-      status: "Unhealthy",
+      status: 'Unhealthy',
       error: error.message,
       timestamp: new Date().toISOString(),
     });
   }
 };
+
 
 exports.dummyHealthCheck = async (req,res) =>{
 

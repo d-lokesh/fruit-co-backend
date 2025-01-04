@@ -27,6 +27,11 @@ app.use(express.json());
 // Routes
 app.use("/api/orders", orderRoutes);
 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  logger.info(`Server is live on port ${PORT} 🌐 🔌`);
+});
+
 // Initialize WhatsApp Client when the server starts
 // WhatsApp Initialization
 const userId = 'testUser';
@@ -38,10 +43,7 @@ console.error('Error initializing WhatsApp client:', error);
 
 
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
-});
+
 
 // Serverless Handler for Vercel
 module.exports = app;
