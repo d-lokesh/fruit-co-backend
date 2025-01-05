@@ -41,6 +41,13 @@ initializeWhatsAppClient(userId);
 console.error('Error initializing WhatsApp client:', error);
 }
 
+console.log(process.env.EMAIL_PASS);
+console.log(process.env.Email_User);
+console.log(process.env.ADMIN_EMAIL);
+
+
+
+
 
 
 
