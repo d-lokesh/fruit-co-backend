@@ -70,8 +70,8 @@ exports.createOrder = async (req, res) => {
     }
 
     // Send notifications
-    await sendOrderPlacedEmail(savedOrder);
-    await sendAdminNotificationEmail(savedOrder);
+    // await sendOrderPlacedEmail(savedOrder);
+    // await sendAdminNotificationEmail(savedOrder);
 
     try {
       await sendEnhancedWhatsAppMessage(
