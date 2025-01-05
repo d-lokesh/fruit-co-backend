@@ -67,7 +67,7 @@ const sendEnhancedWhatsAppMessage = async (orderId, phone, name, plan, deliveryD
   const whatsappMessage = `Hello ${name},\n\nWe’re excited to have you as our valued customer! 🎉\nYour order(Order ID: ${orderId}) has been successfully placed and is currently under review. Here are your order details:\n\n🌟 Plan: ${plan}\n📅 Delivery Date: ${deliveryDate}\n📦 Order Type: ${orderType}\n\nThank you for choosing Daily Fruit Co. We’ll notify you once your order is confirmed and ready for delivery!\n\nBest regards,\nThe Daily Fruit Co Team 🍎`;
 
   try {
-    const media = MessageMedia.fromFilePath('./dfc.png'); // Path to your image
+    const media = MessageMedia.fromFilePath('./oplaced.png'); // Path to your image
     await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
     logger.info('Image sent successfully');
   } catch (error) {

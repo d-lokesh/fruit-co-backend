@@ -78,7 +78,7 @@ const initializeWhatsAppClient = async () => {
   });
 
   client.on('ready', () => {
-    logger.info('🎉🥳🎊 🚀📱 Your WhatsApp client is ready! 🚀📱 🎉🥳🎊');
+    logger.info('🎉  🥳  🎊 🚀📱 Your WhatsApp client is ready! 🚀📱 🎉  🥳  🎊');
     isClientReady = true;
   });
 
