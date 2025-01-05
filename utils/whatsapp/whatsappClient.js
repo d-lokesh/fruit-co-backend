@@ -73,8 +73,8 @@ const initializeWhatsAppClient = async () => {
     logger.info('Client authenticated successfully!');
     logger.info('Waiting for session files to be ready...');
     await delay(50000); // Add a small delay to ensure files are ready
-    logger.info('Uploading session directory to S3...');
-    await uploadSessionToS3(sessionDirectory);
+    // logger.info('Uploading session directory to S3...');
+    // await uploadSessionToS3(sessionDirectory);
   });
 
   client.on('ready', () => {
