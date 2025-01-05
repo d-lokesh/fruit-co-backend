@@ -17,23 +17,23 @@ const sessionDirectory = path.resolve(__dirname, '../../.wwebjs_auth'); // Direc
 const initializeWhatsAppClient = async () => {
   try {
     // Ensure the session directory exists
-    if (!fs.existsSync(sessionDirectory)) {
-      fs.mkdirSync(sessionDirectory, { recursive: true });
-    }
+    // if (!fs.existsSync(sessionDirectory)) {
+    //   fs.mkdirSync(sessionDirectory, { recursive: true });
+    // }
 
-    // Check if session exists locally
-    if (fs.existsSync(path.join(sessionDirectory, 'Default'))) {
-      logger.info('Local session directory exists. Using it...');
-    } else {
-      logger.info(`Local session directory not found. Checking S3...and trying place session at local directory`);
-      const sessionRetrieved = await retrieveSessionFromS3(sessionDirectory);
+    // // Check if session exists locally
+    // if (fs.existsSync(path.join(sessionDirectory, 'Default'))) {
+    //   logger.info('Local session directory exists. Using it...');
+    // } else {
+    //   logger.info(`Local session directory not found. Checking S3...and trying place session at local directory`);
+    //   const sessionRetrieved = await retrieveSessionFromS3(sessionDirectory);
 
-      logger.info("sesssion retrived",sessionRetrieved);
+    //   logger.info("sesssion retrived",sessionRetrieved);
 
-      if (!sessionRetrieved) {
-        logger.info('No valid session found in S3. Creating a new session...');
-      }
-    }
+    //   if (!sessionRetrieved) {
+    //     logger.info('No valid session found in S3. Creating a new session...');
+    //   }
+    // }
 
     // Initialize WhatsApp client
     whatsappClient = new Client({
