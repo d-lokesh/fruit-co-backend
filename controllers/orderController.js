@@ -5,6 +5,8 @@ const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
 const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 
+const mongoose = require('mongoose');
+
 const logger = require('../logger');  // Import the logger
 
 
@@ -25,6 +27,8 @@ const { getWhatsAppClient } = require('../utils/whatsapp/whatsappClient'); // Im
 
 const SampleOrder = require("../models/sampleOrderSchema");
 const SubscriptionOrder = require("../models/subscriptionOrderSchema");
+const Payment = require('../models/paymentSchema'); // Assuming Payment schema is in 'models/Payment'
+
 
 let isWhatsAppInitialized = false;
 
@@ -103,6 +107,100 @@ exports.createOrder = async (req, res) => {
     res.status(500).json({ message: "Error placing order", error: err.message });
   }
 };
+
+exports.markOrderDelivered = async (req, res) => {
+  try {
+    const { orderId, orderType } = req.body;
+
+    if (!orderId || !orderType) {
+      return res.status(400).json({ message: "Order ID and order type are required." });
+    }
+
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0]; // Only the date part, no time
+
+
+    let updatedOrder;
+
+    if (orderType === "samples") {
+      // Update SampleOrder
+      updatedOrder = await SampleOrder.findOneAndUpdate(
+        { _id: orderId, "deliveredDates": { $ne: formattedDate } },
+        {
+          $inc: { numberOfBoxesDelivered: 1 },
+          $push: { deliveredDates: currentDate },
+          status: "Delivered",
+        },
+        { new: true }
+      );
+    } else if (orderType === "subscriptions") {
+      // Update SubscriptionOrder
+      updatedOrder = await SubscriptionOrder.findOneAndUpdate(
+        { _id: orderId, "deliveredDates": { $ne: formattedDate } },
+        {
+          $inc: { numberOfBoxesDelivered: 1 },
+          $push: { deliveredDates: currentDate },
+          status: "Delivered",
+        },
+        { new: true }
+      );
+    } else {
+      return res.status(400).json({ message: "Invalid order type provided." });
+    }
+
+    if (!updatedOrder) {
+      return res.status(400).json({ message: "Order has already been delivered today or doesn't exist." });
+    }
+
+    res.status(200).json({
+      message: "Order marked as delivered.",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error marking order as delivered:", error);
+    res.status(500).json({ message: "Internal server error.", error: error.message });
+  }
+};
+
+
+
+exports.createPayment = async (req, res) => {
+  try {
+    const { orderId, orderType, paymentAmount, paymentMethod } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      console.log("invalid orderid");
+      return res.status(400).json({ message: 'Invalid orderId provided.' });
+    }
+
+    // Validate required fields
+    if (!orderId || !orderType || !paymentAmount || !paymentMethod) {
+      return res.status(400).json({ message: 'Missing required payment details' });
+    }
+
+    // Create new payment record
+    const newPayment = new Payment({
+      orderId,
+      orderType,
+      paymentAmount,
+      paymentMethod,
+      paymentStatus: 'Pending', // Default status is 'Pending'
+    });
+
+    // Save the payment to the database
+    const savedPayment = await newPayment.save();
+
+    // Return the saved payment record
+    res.status(201).json({
+      message: 'Payment created successfully',
+      payment: savedPayment,
+    });
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    res.status(500).json({ message: 'Error creating payment', error: error.message });
+  }
+};
+
 
 
 
@@ -226,7 +324,7 @@ exports.getSampleOrders = async (req, res) => {
 exports.acceptOrder = async (req, res) => {
   try {
     const { id } = req.params; // Extract the ID from the URL
-    const { orderType } = req.body; // Extract the orderType from the request body
+    const { paymentId,paymentMethod,orderType } = req.body; // Extract the orderType from the request body
 
     let order;
     logger.info("oderid and type", id, orderType);
@@ -246,6 +344,8 @@ exports.acceptOrder = async (req, res) => {
 
     // Update order status to "Accepted"
     order.status = "Accepted";
+    order.paymentId=paymentId
+    order.moreInfo=`done payment done via ${paymentMethod}`
     await order.save();
 
     // Send a response back to the client

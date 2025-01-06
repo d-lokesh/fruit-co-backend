@@ -17,6 +17,8 @@ const sampleOrderSchema = new mongoose.Schema(
     numberOfBoxesDelivered: { type: Number, default: 0 },
     latitude: { type: Number }, // Latitude of new address
     longitude: { type: Number }, // Longitude of new address
+    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" }, // Reference to Payment schema
+
   },
   { timestamps: true }
 );
