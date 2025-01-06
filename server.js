@@ -41,14 +41,14 @@ initializeWhatsAppClient(userId);
 console.error('Error initializing WhatsApp client:', error);
 }
 
-console.log(process.env.EMAIL_PASS);
-console.log(process.env.Email_User);
-console.log(process.env.ADMIN_EMAIL);
-console.log(process.env.GOOGLE_PRIVATE_KEY_ID);
+// console.log(process.env.EMAIL_PASS);
+// console.log(process.env.Email_User);
+// console.log(process.env.ADMIN_EMAIL);
+// console.log(process.env.GOOGLE_PRIVATE_KEY_ID);
 
-console.log(process.env.ALLOWED_ORIGIN_3);
+// console.log(process.env.ALLOWED_ORIGIN_3);
 
-console.log(process.env.MONGO_URI);
+// console.log(process.env.MONGO_URI);
 
 
 
