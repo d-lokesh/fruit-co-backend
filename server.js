@@ -8,7 +8,8 @@ const { initializeWhatsAppClient } = require('./utils/whatsapp/whatsappClient');
 const logger = require('./logger');  // Import the logger
 
 
-dotenv.config();
+dotenv.config({ path: './.env' }); // Explicitly specify the path to the .env file
+console.log("ENV Loaded:", process.env);
 connectDB();
 
 const app = express();
