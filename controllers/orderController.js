@@ -106,6 +106,47 @@ exports.createOrder = async (req, res) => {
 
 
 
+exports.updateAddress = async (req, res) => {
+  const { orderId } = req.params;
+  const { address, latitude, longitude } = req.body;
+
+  if (!address) {
+    return res.status(400).json({ message: "Address cannot be empty." });
+  }
+
+  try {
+    // Check if the order exists in SampleOrder or SubscriptionOrder
+    let order = await SampleOrder.findOne({ orderId });
+    let modelType = "SampleOrder";
+
+    if (!order) {
+      order = await SubscriptionOrder.findOne({ orderId });
+      modelType = "SubscriptionOrder";
+    }
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Update the order with the new address, latitude, and longitude
+    order.newAddress = address;
+    order.latitude = latitude;
+    order.longitude = longitude;
+    await order.save();
+
+    return res.status(200).json({
+      message: `Address updated successfully in ${modelType}.`,
+      data: order,
+    });
+  } catch (error) {
+    console.error("Error updating address:", error);
+    return res.status(500).json({ message: "Internal server error.", error });
+  }
+};
+
+
+
+
 exports.getOrderById = async (req, res) => {
   try {
     const { id } = req.params;

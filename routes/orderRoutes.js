@@ -14,6 +14,7 @@ const {
   deleteOrdersIfEmailEmpty,
   getOrderByQuery,
   intiWa,
+  updateAddress
 } = require("../controllers/orderController");
 
 
@@ -23,6 +24,8 @@ router.get("/initWa", intiWa);
 router.post("/", createOrder);
 router.get("/subscriptions",auth, getSubscriptionOrders);
 router.get("/samples",auth, getSampleOrders);
+router.put("/:orderId/update-address", updateAddress);
+
 router.get("/:id", getOrderById);
 
 router.patch("/:id/accept",auth, acceptOrder);
