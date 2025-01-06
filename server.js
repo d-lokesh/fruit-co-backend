@@ -50,6 +50,9 @@ console.error('Error initializing WhatsApp client:', error);
 
 // console.log(process.env.MONGO_URI);
 
+console.log("emailid",process.env.EMAIL_USER);
+console.log("emaikl1_pass",process.env.EMAIL_PASS);
+
 
 
 
