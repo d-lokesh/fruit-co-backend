@@ -9,7 +9,6 @@ const logger = require('./logger');  // Import the logger
 
 
 dotenv.config({ path: './.env' }); // Explicitly specify the path to the .env file
-console.log("ENV Loaded:", process.env);
 connectDB();
 
 const app = express();
@@ -42,17 +41,7 @@ initializeWhatsAppClient(userId);
 console.error('Error initializing WhatsApp client:', error);
 }
 
-// console.log(process.env.EMAIL_PASS);
-// console.log(process.env.Email_User);
-// console.log(process.env.ADMIN_EMAIL);
-// console.log(process.env.GOOGLE_PRIVATE_KEY_ID);
 
-// console.log(process.env.ALLOWED_ORIGIN_3);
-
-// console.log(process.env.MONGO_URI);
-
-console.log("emailid",process.env.EMAIL_USER);
-console.log("emaikl1_pass",process.env.EMAIL_PASS);
 
 
 

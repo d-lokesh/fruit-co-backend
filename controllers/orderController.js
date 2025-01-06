@@ -35,10 +35,9 @@ exports.createOrder = async (req, res) => {
   try {
     let savedOrder;
 
-    orderId = generateOrderId(phone);
+    const orderId = generateOrderId(phone);
 
     if (orderType === "sample") {
-      // Save to SampleOrder collection
       const newSampleOrder = new SampleOrder({
         orderId,
         name,
@@ -52,7 +51,6 @@ exports.createOrder = async (req, res) => {
       });
       savedOrder = await newSampleOrder.save();
     } else if (orderType === "subscription") {
-      // Save to SubscriptionOrder collection
       const newSubscriptionOrder = new SubscriptionOrder({
         orderId,
         name,
@@ -69,30 +67,43 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: "Invalid order type" });
     }
 
-    // Send notifications
-    await sendOrderPlacedEmail(savedOrder);
-    await sendAdminNotificationEmail(savedOrder);
-
-    try {
-      await sendEnhancedWhatsAppMessage(
-        savedOrder.orderId,
-        phone,
-        name,
-        plan,
-        deliveryDate,
-        orderType
-      );
-    } catch (error) {
-      console.error('Error sending WhatsApp message:', error.message);
-    }
- 
-
+    // Respond to the user immediately
     res.status(201).json({ message: "Order placed successfully!", data: savedOrder });
+
+    // Run notifications in the background
+    (async () => {
+      try {
+        await sendOrderPlacedEmail(savedOrder);
+      } catch (error) {
+        console.error("Error sending order placed email:", error.message);
+      }
+
+      try {
+        await sendAdminNotificationEmail(savedOrder);
+      } catch (error) {
+        console.error("Error sending admin notification email:", error.message);
+      }
+
+      try {
+        await sendEnhancedWhatsAppMessage(
+          savedOrder.orderId,
+          phone,
+          name,
+          plan,
+          deliveryDate,
+          orderType
+        );
+      } catch (error) {
+        console.error("Error sending WhatsApp message:", error.message);
+      }
+    })();
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error placing order", error: err.message });
   }
 };
+
 
 
 exports.getOrderById = async (req, res) => {

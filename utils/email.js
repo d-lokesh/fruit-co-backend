@@ -8,8 +8,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-console.log("emailid",process.env.EMAIL_USER);
-console.log("emaikl1_pass",process.env.EMAIL_PASS);
 
 exports.sendOrderPlacedEmail = async (order) => {
   const orderStatusUrl = `http://localhost:3000/check-order-status/${order._id}`;
