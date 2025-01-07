@@ -205,7 +205,6 @@ exports.createPayment = async (req, res) => {
     const { orderId, orderType, paymentAmount, paymentMethod ,paymentDate,dfcOrderId} = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(orderId)) {
-      console.log("invalid orderid");
       return res.status(400).json({ message: 'Invalid orderId provided.' });
     }
 
