@@ -76,7 +76,24 @@ const sendEnhancedWhatsAppMessage = async (orderId, phone, name, plan, deliveryD
   }
 };
 
+const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDate, orderType) => {
+  const client = getWhatsAppClient(); // Use the initialized client
+  const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
+
+  const whatsappMessage = `Hello ${name},\n\nThank you for placing your order with Daily Fruit Co.! 🎉\n\nHere are your order details:\n\n🌟 Plan: ${plan}\n📦 Order Type: ${orderType}\n📅 Delivery Date: ${deliveryDate}\n🆔 Order ID: ${orderId}\n\nTo confirm your order, please complete the payment using the QR code we’ve sent to you.\n\nOnce the payment is received, we’ll process your order and prepare it for delivery.\n\nThank you for choosing Daily Fruit Co.!\n\nBest regards,\nThe Daily Fruit Co. Team 🍎`;
+
+  try {
+    const media = MessageMedia.fromFilePath('./bharathQr.jpg'); // Path to your image
+    await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
+    logger.info('Image sent successfully');
+  } catch (error) {
+    console.error('Failed to send WhatsApp message or image:', error);
+    throw new Error('Message sending failed');
+  }
+};
+
 module.exports = {
   initializeWhatsAppClient,
   sendEnhancedWhatsAppMessage,
+  sendQrCodeWhatsAppMessage
 };

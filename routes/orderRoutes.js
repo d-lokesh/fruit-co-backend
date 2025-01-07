@@ -16,7 +16,8 @@ const {
   intiWa,
   updateAddress,
   createPayment,
-  markOrderDelivered
+  markOrderDelivered,
+  sendQrCode
 } = require("../controllers/orderController");
 
 
@@ -28,6 +29,7 @@ router.get("/subscriptions",auth, getSubscriptionOrders);
 router.get("/samples",auth, getSampleOrders);
 router.put("/:orderId/update-address", updateAddress);
 router.post("/payments/create",auth,createPayment);
+router.post("/payments/sendqrcode",auth, sendQrCode);
 
 router.get("/:id", getOrderById);
 

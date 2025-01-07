@@ -17,7 +17,7 @@ const os = require("os");
 
 const {initializeWhatsAppClient,  } = require('../utils/whatsapp/whatsappClient'); // Import the WhatsApp utility
 
-const {sendEnhancedWhatsAppMessage} =  require('../utils/whatsapp/whatsapp');
+const {sendEnhancedWhatsAppMessage,sendQrCodeWhatsAppMessage} =  require('../utils/whatsapp/whatsapp');
 
 const { getWhatsAppClient } = require('../utils/whatsapp/whatsappClient'); // Import getClient function
 
@@ -122,18 +122,7 @@ exports.markOrderDelivered = async (req, res) => {
 
     let updatedOrder;
 
-    if (orderType === "samples") {
-      // Update SampleOrder
-      updatedOrder = await SampleOrder.findOneAndUpdate(
-        { _id: orderId, "deliveredDates": { $ne: formattedDate } },
-        {
-          $inc: { numberOfBoxesDelivered: 1 },
-          $push: { deliveredDates: currentDate },
-          status: "Delivered",
-        },
-        { new: true }
-      );
-    } else if (orderType === "subscriptions") {
+      if (orderType === "subscriptions") {
       // Update SubscriptionOrder
       updatedOrder = await SubscriptionOrder.findOneAndUpdate(
         { _id: orderId, "deliveredDates": { $ne: formattedDate } },
@@ -144,7 +133,18 @@ exports.markOrderDelivered = async (req, res) => {
         },
         { new: true }
       );
-    } else {
+    } else if (orderType === "samples") {
+      // Update SampleOrder
+      updatedOrder = await SampleOrder.findOneAndUpdate(
+        { _id: orderId, "deliveredDates": { $ne: formattedDate } },
+        {
+          $inc: { numberOfBoxesDelivered: 1 },
+          $push: { deliveredDates: currentDate },
+          status: "Delivered",
+        },
+        { new: true }
+      );
+    }else {
       return res.status(400).json({ message: "Invalid order type provided." });
     }
 
@@ -161,6 +161,31 @@ exports.markOrderDelivered = async (req, res) => {
     res.status(500).json({ message: "Internal server error.", error: error.message });
   }
 };
+
+ // Replace with any SMS provider
+
+exports.
+sendQrCode = async (req, res) => {
+  const { order } = req.body;
+
+  try {
+    const qrCodeUrl = './bharathQr.jpg'; // Replace with your static QR code URL
+
+    // Send QR code via SMS
+    sendQrCodeWhatsAppMessage(order.orderId,
+      order.phone,
+      order.name,
+      order.plan,
+      order.deliveryDate,
+      order.orderType)
+
+    res.status(200).json({ success: true, message: "QR code sent successfully" });
+  } catch (error) {
+    console.error("Error sending QR code:", error);
+    res.status(500).json({ success: false, error: "Failed to send QR code" });
+  }
+};
+
 
 
 
