@@ -191,7 +191,7 @@ sendQrCode = async (req, res) => {
 
 exports.createPayment = async (req, res) => {
   try {
-    const { orderId, orderType, paymentAmount, paymentMethod } = req.body;
+    const { orderId, orderType, paymentAmount, paymentMethod ,paymentDate,dfcOrderId} = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(orderId)) {
       console.log("invalid orderid");
@@ -199,9 +199,11 @@ exports.createPayment = async (req, res) => {
     }
 
     // Validate required fields
-    if (!orderId || !orderType || !paymentAmount || !paymentMethod) {
+    if (!orderId || !orderType || !paymentAmount || !paymentMethod || !dfcOrderId) {
       return res.status(400).json({ message: 'Missing required payment details' });
     }
+
+    dfcPaymentId = generatePaymentId(dfcOrderId)
 
     // Create new payment record
     const newPayment = new Payment({
@@ -209,11 +211,40 @@ exports.createPayment = async (req, res) => {
       orderType,
       paymentAmount,
       paymentMethod,
-      paymentStatus: 'Pending', // Default status is 'Pending'
+      paymentDate,
+      dfcOrderId,
+      dfcPaymentId // Default status is 'Pending'
     });
+
+    console.log("paymentDate",newPayment);
 
     // Save the payment to the database
     const savedPayment = await newPayment.save();
+
+    let order = await SubscriptionOrder.findOne({ orderId });
+    if (!order) {
+      order = await SampleOrder.findOne({ orderId });
+    }
+
+    if (!order) {
+      console.log("order not found");
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Update the payment info in order
+    order.paymentId = savedPayment._id;
+    order.moreInfo = `payment done via ${paymentMethod}`;
+    order.dfcPaymentId = dfcPaymentId;
+    
+    try{
+    await order.save();
+    }catch(error){
+      console.log("error while saving order");
+      console.error('Error :', error);
+
+    }
+
+
 
     // Return the saved payment record
     res.status(201).json({
@@ -444,7 +475,7 @@ exports.rejectOrder = async (req, res) => {
 
       const phoneNumber = '7995830577'; // Specify the phone number to delete orders
 
-const ordersToDelete = await SubscriptionOrder.find({ phone: phoneNumber });
+const ordersToDelete = await SampleOrder.find({ phone: phoneNumber });
 
 if (ordersToDelete.length === 0) {
   return res.status(404).send({ message: "No orders with the specified phone number found" });
@@ -506,6 +537,15 @@ await SubscriptionOrder.deleteMany({ phone: phoneNumber });
     const lastFourDigits = phone.slice(-4); // Get the last four digits of the phone number
     
     return `ODFC${minutes}${seconds}${lastFourDigits}`; // Format orderId as ODFC-MMSS-XXXX
+};
+
+const generatePaymentId = (dfcOrderId) => {
+  const currentDate = new Date();
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0'); // Get minutes, ensure 2 digits
+  const seconds = String(currentDate.getSeconds()).padStart(2, '0'); // Get seconds, ensure 2 digits
+  const lastFourDigits = dfcOrderId.slice(-4); // Get the last four digits of the phone number
+  
+  return `TRODFC${minutes}${seconds}${lastFourDigits}`; // Format orderId as ODFC-MMSS-XXXX
 };
 
 

@@ -18,6 +18,10 @@ const subscriptionOrderSchema = new mongoose.Schema(
     latitude: { type: Number }, // Latitude of new address
     longitude: { type: Number }, // Longitude of new address
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" }, // Reference to Payment schema
+    dfcPaymentId:{
+      type: String, 
+    required: true 
+  }
     
   },
   { timestamps: true }

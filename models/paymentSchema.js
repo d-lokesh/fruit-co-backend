@@ -10,6 +10,14 @@ const paymentSchema = new mongoose.Schema(
       type: String, 
       required: true 
     }, // Determines if the payment is linked to a SampleOrder or SubscriptionOrder
+    dfcOrderId:{
+        type: String, 
+      required: true 
+    },
+    dfcPaymentId:{
+        type: String, 
+      required: true 
+    },
     paymentDate: { 
       type: Date, 
       required: true, 
