@@ -438,13 +438,13 @@ exports.acceptOrder = async (req, res) => {
 
       try {
         await sendOrderConfirmationWhatsAppMessage(
-          savedOrder.orderId,
-          savedOrder.dfcPaymentId,
-          savedOrder.phone,
-          savedOrder.name,
-          savedOrder.plan,
-          savedOrder.deliveryDate,
-          savedOrder.orderType
+          order.orderId,
+          order.dfcPaymentId,
+          order.phone,
+          order.name,
+          order.plan,
+          order.deliveryDate,
+          order.orderType
         );
       } catch (error) {
         console.error("Error sending WhatsApp message:", error.message);
