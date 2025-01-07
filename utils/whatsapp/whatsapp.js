@@ -76,6 +76,39 @@ const sendEnhancedWhatsAppMessage = async (orderId, phone, name, plan, deliveryD
   }
 };
 
+const sendOrderConfirmationWhatsAppMessage = async (orderId,dfcPaymentId, phone, name, plan, deliveryDate, orderType) => {
+  const client = getWhatsAppClient(); // Use the initialized client
+  const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
+
+  const whatsappMessage = `Hello ${name},\n\n✨ Great news! Your payment for Order ID: ${orderId} has been successfully confirmed. 🏦\n\n💳 Payment ID: ${dfcPaymentId}\n\n Your order is now fully confirmed and will be delivered as scheduled. 🚛💨\n\nHere are your order details:\n\n🌟 Plan: ${plan}\n📅 Scheduled Delivery Date: ${deliveryDate}\n📦 Order Type: ${orderType}\n\nWe’re thrilled to serve you the freshest and finest fruits from Daily Fruit Co. 🥝🍇🍎\n\nFor any questions or assistance, feel free to reach out to us anytime.\n\nThank you for choosing Daily Fruit Co!\n\nBest regards,\nThe Daily Fruit Co Team 🍎`;
+
+  try {
+    const media = MessageMedia.fromFilePath('./acceptO.png'); // Path to your confirmation image
+    await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
+    logger.info('Order confirmation message sent successfully');
+  } catch (error) {
+    console.error('Failed to send WhatsApp message or image:', error);
+    throw new Error('Message sending failed');
+  }
+};
+
+const sendOrderRejectedWhatsAppMessage = async (orderId, phone, name, plan, orderType) => {
+  const client = getWhatsAppClient(); // Use the initialized client
+  const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
+
+  const whatsappMessage = `Hello ${name},\n\nWe regret to inform you that your order (Order ID: ${orderId}) for the ${plan} ${orderType} could not be processed at this time due to our delivery policies or service limitations in your area. 🚫\n\nWe sincerely apologize for this inconvenience and want to assure you that we are working to expand our service coverage. 🗺️\n\nWe truly value your interest in Daily Fruit Co, and we look forward to serving you as soon as we start operations in your location. 🌟\n\nThank you for your understanding and patience.\n\nWarm regards,\nThe Daily Fruit Co Team 🍎`;
+
+  try {
+    const media = MessageMedia.fromFilePath('./order_rejected.png'); // Path to your rejection-related image
+    await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
+    logger.info('Rejection message sent successfully');
+  } catch (error) {
+    console.error('Failed to send WhatsApp rejection message or image:', error);
+    throw new Error('Message sending failed');
+  }
+};
+
+
 const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDate, orderType) => {
   const client = getWhatsAppClient(); // Use the initialized client
   const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
@@ -83,7 +116,7 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
   const whatsappMessage = `Hello ${name},\n\nThank you for placing your order with Daily Fruit Co.! 🎉\n\nHere are your order details:\n\n🌟 Plan: ${plan}\n📦 Order Type: ${orderType}\n📅 Delivery Date: ${deliveryDate}\n🆔 Order ID: ${orderId}\n\nTo confirm your order, please complete the payment using the QR code we’ve sent to you.\n\nOnce the payment is received, we’ll process your order and prepare it for delivery.\n\nThank you for choosing Daily Fruit Co.!\n\nBest regards,\nThe Daily Fruit Co. Team 🍎`;
 
   try {
-    const media = MessageMedia.fromFilePath('./bharathQr.jpg'); // Path to your image
+    const media = MessageMedia.fromFilePath('./finalQr.png'); // Path to your image
     await client.sendMessage(formattedPhone, media, { caption: whatsappMessage });
     logger.info('Image sent successfully');
   } catch (error) {
@@ -95,5 +128,7 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
 module.exports = {
   initializeWhatsAppClient,
   sendEnhancedWhatsAppMessage,
-  sendQrCodeWhatsAppMessage
+  sendQrCodeWhatsAppMessage,
+  sendOrderConfirmationWhatsAppMessage,
+  sendOrderRejectedWhatsAppMessage
 };

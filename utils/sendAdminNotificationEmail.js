@@ -12,8 +12,8 @@ exports.sendAdminNotificationEmail = async (order) => {
   // Dynamic email title based on order type
   const isSampleOrder = order.orderType === "sample";
   const adminTitle = isSampleOrder
-    ? `📦 New Sample Order Received @ Fruit Co`
-    : `📦 New Subscription Plan Order Received @ Fruit Co`;
+    ? `📦 New Sample Order Received @ Daily Fruit Co`
+    : `📦 New Subscription Plan Order Received @ Daily Fruit Co`;
 
   const adminPortalUrl = `https://dfc-admin-portal.netlify.app`;
 
@@ -25,7 +25,7 @@ exports.sendAdminNotificationEmail = async (order) => {
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
+        background-color: #f9f9f9;
         margin: 0;
         padding: 0;
       }
@@ -37,13 +37,18 @@ exports.sendAdminNotificationEmail = async (order) => {
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border: 2px solid #c8e6c9;
       }
       .header {
         text-align: center;
-        background-color: #4CAF50;
+        background-color: #28a745;
         color: white;
-        padding: 10px 0;
+        padding: 20px;
         border-radius: 8px 8px 0 0;
+      }
+      .header .icon {
+        font-size: 50px;
+        margin-bottom: 10px;
       }
       .order-details {
         padding: 20px;
@@ -54,53 +59,63 @@ exports.sendAdminNotificationEmail = async (order) => {
         width: 100%;
         border-collapse: collapse;
         margin: 20px 0;
+        font-size: 16px;
       }
-      .order-details table th, .order-details table td {
+      .order-details table th,
+      .order-details table td {
         border: 1px solid #ddd;
-        padding: 8px;
+        padding: 12px;
         text-align: left;
       }
       .order-details table th {
-        background-color: #4CAF50;
+        background-color: #28a745;
         color: white;
-      }
-      .footer {
-        text-align: center;
-        padding: 20px;
-        color: #888;
-        background-color: #f0f0f0;
-        border-radius: 0 0 8px 8px;
+        text-transform: uppercase;
+        font-weight: bold;
       }
       .button-container {
         text-align: center;
         margin: 20px 0;
       }
       .button-container a {
-        background-color: #4CAF50;
+        background-color: #28a745;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 5px;
+        font-size: 16px;
       }
       .button-container a:hover {
-        background-color: #45a049;
+        background-color: #218838;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+        background-color: #f9f9f9;
+        border-radius: 0 0 8px 8px;
+      }
+      .footer p {
+        margin: 10px 0;
+        font-size: 14px;
       }
     </style>
   </head>
   <body>
     <div class="email-container">
       <div class="header">
+        <div class="icon">📦</div>
         <h1>${isSampleOrder ? "New Sample Order" : "New Subscription Plan Order"}</h1>
       </div>
       <div class="order-details">
-        <p><b>A new order has been received on Daily Fruit Co. Please review the order details below:</b></p>
+        <p><b>A new order has been placed on Daily Fruit Co. Please review the details below:</b></p>
         <table>
           <tr>
             <th>Detail</th>
             <th>Information</th>
           </tr>
           <tr>
-            <td>OrderId</td>
+            <td>Order ID</td>
             <td>${order.orderId}</td>
           </tr>
           <tr>
@@ -133,8 +148,8 @@ exports.sendAdminNotificationEmail = async (order) => {
         </div>
       </div>
       <div class="footer">
-        <p><b>Next Steps:</b> Log in to the admin portal to confirm and process the order, or contact the customer directly using the phone number provided.</p>
-        <p>From the Team, Fruit Co</p>
+        <p><b>Next Steps:</b> Log in to the admin portal to review, confirm, and process the order. You can also contact the customer directly for clarifications.</p>
+        <p>From the Team, Daily Fruit Co</p>
         <p>&copy; 2024 Daily Fruit Co. All rights reserved.</p>
       </div>
     </div>

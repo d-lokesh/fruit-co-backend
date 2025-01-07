@@ -9,15 +9,14 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.sendOrderAcceptedEmail = async (order) => {
-  // Determine email title and content based on order type
   const isSampleOrder = order.orderType === "sample";
   const A_title = isSampleOrder
-    ? `🍎 Your Sample Order Has Been Accepted!`
-    : `🍎 Your Subscription Order Has Been Accepted!`;
+    ? `🍎💳 Payment Received & Sample Order Accepted!`
+    : `🍎💳 Payment Received & Subscription Order Confirmed!`;
 
   const orderMessage = isSampleOrder
-    ? `<p class="highlight">Great news! Your sample order is being prepared and will be shipped soon.</p>`
-    : `<p class="highlight">Fantastic! Your subscription order is confirmed and is being prepared for delivery.</p>`;
+    ? `<p class="highlight">Thank you! Your payment has been received 💳, and your sample order is being prepared for delivery.</p>`
+    : `<p class="highlight">Thank you! Your payment has been received 💳, and your subscription order is confirmed. Your order will be delivered as scheduled.</p>`;
 
   const A_html = `
   <!DOCTYPE html>
@@ -44,8 +43,8 @@ exports.sendOrderAcceptedEmail = async (order) => {
       }
       .header {
         text-align: center;
-        background-color: #8bc34a;
-        color: white;
+        background-color: #4a5568; /* bg-gray-800 */
+        color: #48bb78; /* text-green-500 */
         padding: 20px;
         border-radius: 8px 8px 0 0;
       }
@@ -58,7 +57,7 @@ exports.sendOrderAcceptedEmail = async (order) => {
       }
       .sub-header {
         text-align: center;
-        color: #4caf50;
+        color: #48bb78; /* text-green-500 */
         font-weight: bold;
         margin: 20px 0;
       }
@@ -71,16 +70,26 @@ exports.sendOrderAcceptedEmail = async (order) => {
         width: 100%;
         border-collapse: collapse;
         margin: 20px 0;
+        border-radius: 8px;
+        overflow: hidden;
       }
       .order-details table th,
       .order-details table td {
-        border: 1px solid #ddd;
-        padding: 8px;
+        padding: 12px;
         text-align: left;
+        border-bottom: 1px solid #e0e0e0;
       }
       .order-details table th {
-        background-color: #8bc34a;
-        color: white;
+        background-color: #4a5568; /* bg-gray-800 */
+        color: #ffffff;
+        text-transform: uppercase;
+        font-size: 14px;
+      }
+      .order-details table tr:nth-child(even) {
+        background-color: #f3f4f6; /* lighter row background */
+      }
+      .order-details table tr:hover {
+        background-color: #e0e0e0; /* hover effect */
       }
       .highlight {
         color: #2e7d32;
@@ -94,15 +103,19 @@ exports.sendOrderAcceptedEmail = async (order) => {
         margin: 20px 0;
       }
       .button-container a {
-        background-color: #4caf50;
-        color: white;
-        padding: 10px 20px;
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #4a5568; /* bg-gray-800 */
+        color: #48bb78; /* text-green-500 */
         text-decoration: none;
-        border-radius: 5px;
+        border-radius: 8px;
         font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* shadow-lg */
+        transition: all 0.3s ease-in-out;
       }
       .button-container a:hover {
-        background-color: #388e3c;
+        background-color: #2d3748; /* hover:bg-gray-700 */
+        color: white; /* hover:text-white */
       }
       .footer {
         text-align: center;
@@ -112,61 +125,70 @@ exports.sendOrderAcceptedEmail = async (order) => {
         border-radius: 0 0 8px 8px;
       }
       .footer img {
-        max-width: 50px;
+        max-width: 80px;
         margin: 10px auto;
+        display: block;
       }
     </style>
   </head>
   <body>
     <div class="email-container">
       <div class="header">
-        <div class="emoji">🍎🥜</div>
-        <h1>Order Accepted!</h1>
+        <div class="emoji">🍎💳</div>
+        <h1>Payment Received & Order Accepted!</h1>
       </div>
       <div class="sub-header">
-        "Start your healthy lifestyle journey with Fruit Co!"
+        "Thank you for starting your healthy lifestyle journey with Daily Fruit Co!"
       </div>
       <div class="order-details">
         ${orderMessage}
         <b>Here are the details of your order:</b>
         <table>
-          <tr>
-            <th>Detail</th>
-            <th>Information</th>
-          </tr>
-          <tr>
-            <td>OrderId</td>
-            <td>${order.orderId}</td>
-          </tr>
-          <tr>
-            <td>Name</td>
-            <td>${order.name}</td>
-          </tr>
-          <tr>
-            <td>Address</td>
-            <td>${order.address}</td>
-          </tr>
-          <tr>
-            <td>Phone</td>
-            <td>${order.phone}</td>
-          </tr>
-          <tr>
-            <td>Plan</td>
-            <td>${order.plan}</td>
-          </tr>
-          <tr>
-            <td>Delivery Date</td>
-            <td>${new Date(order.deliveryDate).toLocaleString()}</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>Detail</th>
+              <th>Information</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Payment Id</td>
+              <td>${order.dfcPaymentId}</td>
+            </tr>
+            <tr>
+              <td>OrderId</td>
+              <td>${order.orderId}</td>
+            </tr>
+            <tr>
+              <td>Name</td>
+              <td>${order.name}</td>
+            </tr>
+            <tr>
+              <td>Address</td>
+              <td>${order.address}</td>
+            </tr>
+            <tr>
+              <td>Phone</td>
+              <td>${order.phone}</td>
+            </tr>
+            <tr>
+              <td>Plan</td>
+              <td>${order.plan}</td>
+            </tr>
+            <tr>
+              <td>Delivery Date</td>
+              <td>${new Date(order.deliveryDate).toLocaleString()}</td>
+            </tr>
+          </tbody>
         </table>
         <div class="button-container">
-          <a href="http://localhost:3000/check-order-status/${order._id}">Check Order Status</a>
+          <a href="http://localhost:3000/check-order-status/">Check Order Status</a>
         </div>
       </div>
       <div class="footer">
         <p>Thank you for choosing Fruit Co for your healthy lifestyle needs!</p>
-        <img src="https://example.com/path-to-fruit-logo.png" alt="Fruit Co Logo">
-        <p>&copy; 2024 Daily Fruit Co. All rights reserved.</p> 
+<img src="data:image/png;base64,BASE64_STRING_HERE" alt="Daily Fruit Co Logo">
+        <p>&copy; 2024 Daily Fruit Co. All rights reserved.</p>
       </div>
     </div>
   </body>

@@ -3,6 +3,7 @@ const { sendOrderPlacedEmail } = require("../utils/email");
 const {sendOrderRejectedEmail} = require("../utils/rejectOrder_email")
 const {sendOrderAcceptedEmail} = require("../utils/order_accepted_mail")
 const {sendAdminNotificationEmail} = require("../utils/sendAdminNotificationEmail")
+const {sendDeliveryConfirmationEmail} = require("../utils/dcMail")
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 
 const mongoose = require('mongoose');
@@ -17,7 +18,7 @@ const os = require("os");
 
 const {initializeWhatsAppClient,  } = require('../utils/whatsapp/whatsappClient'); // Import the WhatsApp utility
 
-const {sendEnhancedWhatsAppMessage,sendQrCodeWhatsAppMessage} =  require('../utils/whatsapp/whatsapp');
+const {sendEnhancedWhatsAppMessage,sendQrCodeWhatsAppMessage,sendOrderConfirmationWhatsAppMessage,sendOrderRejectedWhatsAppMessage} =  require('../utils/whatsapp/whatsapp');
 
 const { getWhatsAppClient } = require('../utils/whatsapp/whatsappClient'); // Import getClient function
 
@@ -152,10 +153,21 @@ exports.markOrderDelivered = async (req, res) => {
       return res.status(400).json({ message: "Order has already been delivered today or doesn't exist." });
     }
 
+
     res.status(200).json({
       message: "Order marked as delivered.",
       order: updatedOrder,
     });
+
+    (async () => {
+      try {
+        await  sendDeliveryConfirmationEmail(updatedOrder);
+
+      } catch (error) {
+        console.error("Error sending Delivery confirmation email:", error.message);
+      }
+
+    })();
   } catch (error) {
     console.error("Error marking order as delivered:", error);
     res.status(500).json({ message: "Internal server error.", error: error.message });
@@ -164,8 +176,7 @@ exports.markOrderDelivered = async (req, res) => {
 
  // Replace with any SMS provider
 
-exports.
-sendQrCode = async (req, res) => {
+exports.sendQrCode = async (req, res) => {
   const { order } = req.body;
 
   try {
@@ -216,34 +227,42 @@ exports.createPayment = async (req, res) => {
       dfcPaymentId // Default status is 'Pending'
     });
 
-    console.log("paymentDate",newPayment);
-
     // Save the payment to the database
     const savedPayment = await newPayment.save();
 
-    let order = await SubscriptionOrder.findOne({ orderId });
-    if (!order) {
-      order = await SampleOrder.findOne({ orderId });
-    }
 
-    if (!order) {
-      console.log("order not found");
-      return res.status(404).json({ message: "Order not found." });
-    }
 
-    // Update the payment info in order
-    order.paymentId = savedPayment._id;
-    order.moreInfo = `payment done via ${paymentMethod}`;
-    order.dfcPaymentId = dfcPaymentId;
+    // const order = await SubscriptionOrder.findOneAndUpdate(
+    //   { _id: orderId }, // Query by `_id`
+    //   {
+    //     $set: {
+    //       paymentId: savedPayment._id,
+    //       moreInfo: `payment done via ${paymentMethod}`,
+    //       dfcPaymentId: dfcPaymentId
+    //     }
+    //   },
+    //   { new: true } // To return the updated document
+    // );
     
-    try{
-    await order.save();
-    }catch(error){
-      console.log("error while saving order");
-      console.error('Error :', error);
-
-    }
-
+    
+    // if (!order) {
+    //   const order = await SampleOrder.findOneAndUpdate(
+    //     { _id: orderId }, // Query by `_id`
+    //     {
+    //       $set: {
+    //         paymentId: savedPayment._id,
+    //         moreInfo: `payment done via ${paymentMethod}`,
+    //         dfcPaymentId: dfcPaymentId
+    //       }
+    //     },
+    //     { new: true } // To return the updated document
+    //   );
+      
+    // }
+    
+    // if (!order) {
+    //   return res.status(404).json({ message: "Order not found." });
+    // }
 
 
     // Return the saved payment record
@@ -380,7 +399,7 @@ exports.getSampleOrders = async (req, res) => {
 exports.acceptOrder = async (req, res) => {
   try {
     const { id } = req.params; // Extract the ID from the URL
-    const { paymentId,paymentMethod,orderType } = req.body; // Extract the orderType from the request body
+    const { paymentId,paymentMethod,orderType,dfcPaymentId } = req.body; // Extract the orderType from the request body
 
     let order;
     logger.info("oderid and type", id, orderType);
@@ -400,15 +419,41 @@ exports.acceptOrder = async (req, res) => {
 
     // Update order status to "Accepted"
     order.status = "Accepted";
-    order.paymentId=paymentId
-    order.moreInfo=`done payment done via ${paymentMethod}`
+    order.paymentId=paymentId;
+    order.moreInfo = `payment done via ${paymentMethod}`;
+    order.dfcPaymentId = dfcPaymentId;
+
     await order.save();
 
     // Send a response back to the client
     res.send({ message: "Order accepted", orderId: order._id });
 
     // Send an email notification
-    await sendOrderAcceptedEmail(order);
+
+    (async () => {
+      try {
+        await sendOrderAcceptedEmail(order);
+      } catch (error) {
+        console.error("Error sending Order accepted email:", error.message);
+      }
+
+      try {
+        await sendOrderConfirmationWhatsAppMessage(
+          savedOrder.orderId,
+          savedOrder.dfcPaymentId,
+          savedOrder.phone,
+          savedOrder.name,
+          savedOrder.plan,
+          savedOrder.deliveryDate,
+          savedOrder.orderType
+        );
+      } catch (error) {
+        console.error("Error sending WhatsApp message:", error.message);
+      }
+    
+
+    })();
+
   } catch (error) {
     logger.info(error);
     res.status(500).json({ error: error.message });
@@ -445,15 +490,34 @@ exports.rejectOrder = async (req, res) => {
     // Save the updated order
     await order.save();
 
-    // Send an email notification
-    try {
-      await sendOrderRejectedEmail(order);
-    } catch (emailError) {
-      logger.info("Error sending rejection email:", emailError);
-    }
+   
 
     // Respond to the client
     res.send({ message: "Order rejected", orderId: order._id });
+
+    // Send an email notification
+    (async () => {
+      try {
+        await sendOrderRejectedEmail(order);
+      } catch (error) {
+        logger.info("Error sending rejection email:", error.message);
+      }
+
+      try {
+        await sendOrderRejectedWhatsAppMessage(
+          order.orderId,
+          order.phone,
+          order.name,
+          order.plan,
+          order.orderType
+        );
+      } catch (error) {
+        console.error("Error sending WhatsApp message:", error.message);
+      }
+
+    })();
+
+
   } catch (error) {
     console.error("Error rejecting order:", error);
     res.status(500).json({ error: error.message });

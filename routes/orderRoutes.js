@@ -23,7 +23,7 @@ const {
 
 router.get("/health-check", healthCheck);
 router.get("/dummy-health-check", dummyHealthCheck);
-router.get("/initWa", intiWa);
+router.get("/initWa",auth, intiWa);
 router.post("/", createOrder);
 router.get("/subscriptions",auth, getSubscriptionOrders);
 router.get("/samples",auth, getSampleOrders);
@@ -37,7 +37,7 @@ router.patch("/:id/accept",auth, acceptOrder);
 router.patch("/:id/reject",auth, rejectOrder);
 router.patch("/markOrderDelivered",auth, markOrderDelivered);
 
-router.delete('/deleteIfEmailEmpty', deleteOrdersIfEmailEmpty); // Define the route
+router.delete('/deleteIfEmailEmpty',auth, deleteOrdersIfEmailEmpty); // Define the route
 router.get('/orderData', getOrderByQuery);
 
 
