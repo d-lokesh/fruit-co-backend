@@ -20,7 +20,6 @@ const sampleOrderSchema = new mongoose.Schema(
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" }, // Reference to Payment schema
     dfcPaymentId:{
       type: String, 
-    required: true 
   }
 
   },
