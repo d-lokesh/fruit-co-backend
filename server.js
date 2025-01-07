@@ -35,11 +35,11 @@ app.listen(PORT, () => {
 // Initialize WhatsApp Client when the server starts
 // WhatsApp Initialization
 const userId = 'testUser';
-// try{
-// initializeWhatsAppClient(userId);
-// } catch (error) {
-// console.error('Error initializing WhatsApp client:', error);
-// }
+try{
+initializeWhatsAppClient(userId);
+} catch (error) {
+console.error('Error initializing WhatsApp client:', error);
+}
 
 
 
