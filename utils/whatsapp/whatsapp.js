@@ -80,7 +80,7 @@ const sendOrderConfirmationWhatsAppMessage = async (orderId,dfcPaymentId, phone,
   const client = getWhatsAppClient(); // Use the initialized client
   const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
 
-  const whatsappMessage = `Hello ${name},\n\n✨ Great news! Your payment for Order ID: ${orderId} has been successfully confirmed. 🏦\n\n💳 Payment ID: ${dfcPaymentId}\n\n Your order is now fully confirmed and will be delivered as scheduled. 🚛💨\n\nHere are your order details:\n\n🌟 Plan: ${plan}\n📅 Scheduled Delivery Date: ${deliveryDate}\n📦 Order Type: ${orderType}\n\nWe’re thrilled to serve you the freshest and finest fruits from Daily Fruit Co. 🥝🍇🍎\n\nFor any questions or assistance, feel free to reach out to us anytime.\n\nThank you for choosing Daily Fruit Co!\n\nBest regards,\nThe Daily Fruit Co Team 🍎`;
+  const whatsappMessage = `Hello ${name},\n\n✨ Exciting news! Your payment for Order ID: ${orderId} is confirmed! 🏦\n\n💳 Payment ID: ${dfcPaymentId}\n\nYour order is now fully confirmed and will be delivered on schedule. 🚛💨\n\nOrder details:\n🌟 Plan: ${plan}\n📅 Delivery Date: ${deliveryDate}\n📦 Order Type: ${orderType}\n\nWe're thrilled to bring you the freshest fruits from Daily Fruit Co. 🥝🍇🍎\nNeed help? We're always here for you!\n\nThank you for choosing Daily Fruit Co.!\nBest regards,\nThe Daily Fruit Co. Team `;
 
   try {
     const media = MessageMedia.fromFilePath('./acceptO.png'); // Path to your confirmation image
@@ -113,7 +113,7 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
   const client = getWhatsAppClient(); // Use the initialized client
   const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
 
-  const whatsappMessage = `Hello ${name},\n\nThank you for placing your order with Daily Fruit Co.! 🎉\n\nHere are your order details:\n\n🌟 Plan: ${plan}\n📦 Order Type: ${orderType}\n📅 Delivery Date: ${deliveryDate}\n🆔 Order ID: ${orderId}\n\nTo confirm your order, please complete the payment using the QR code we’ve sent to you.\n\nOnce the payment is received, we’ll process your order and prepare it for delivery.\n\nThank you for choosing Daily Fruit Co.!\n\nBest regards,\nThe Daily Fruit Co. Team 🍎`;
+  const whatsappMessage = `Hello ${name},\n\nThanks for ordering from Daily Fruit Co.! 🎉\n\nYour order details:\n🌟 Plan: ${plan}\n📦 Type: ${orderType}\n📅 Delivery Date: ${deliveryDate}\n🆔 Order ID: ${orderId}\n\nPlease complete payment via the QR code to confirm. We'll process and deliver your order once payment is received.\n\nThanks for choosing us! 🍎`;
 
   try {
     const media = MessageMedia.fromFilePath('./finalQr.png'); // Path to your image
