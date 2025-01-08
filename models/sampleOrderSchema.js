@@ -26,4 +26,4 @@ const sampleOrderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("SampleOrder", sampleOrderSchema,"DailyFruitco");
+module.exports = mongoose.model("SampleOrder", sampleOrderSchema);
