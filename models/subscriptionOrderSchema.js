@@ -26,4 +26,4 @@ const subscriptionOrderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("SubscriptionOrder", subscriptionOrderSchema);
+module.exports = mongoose.model("SubscriptionOrder", subscriptionOrderSchema,"DailyFruitco");

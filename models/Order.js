@@ -11,4 +11,4 @@ const orderSchema = new mongoose.Schema({
   moreInfo: { type: String, required: false }  
 }, { timestamps: true });
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model("Order", orderSchema,"DailyFruitco");
