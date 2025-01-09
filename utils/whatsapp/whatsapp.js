@@ -120,10 +120,10 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
   console.log(plan);
 
   const amount = 
-  orderType === "Sample" && plan === "Premium box" ? 149 :
-  orderType === "Subscription" && plan === "Premium box" ? 2899 :
-  orderType === "Sample" && plan === "Regular box" ? 99 :
-  orderType === "Subscription" && plan === "Regular box" ? 1899 :
+  orderType === "sample" && plan === "Premium Box" ? 149 :
+  orderType === "Subscription" && plan === "Premium Box" ? 2899 :
+  orderType === "sample" && plan === "Regular Box" ? 99 :
+  orderType === "subscription" && plan === "Regular Box" ? 1899 :
   0;
 
 const whatsappMessage = `Hello ${name},\n\nThank you for choosing Daily Fruit Co.! 🎉\n\nOrder details:\n🌟 Plan: ${plan}\n📦 Type: ${orderType}\n📅 Delivery Date: ${deliveryDate}\n🆔 Order ID: ${orderId}\n💰 Amount Payable: ₹${amount}\n\nTo ensure your delivery is prepared as scheduled, please complete the payment of ₹${amount} using the QR code provided. Once confirmed, we’ll process your order promptly.\n\nWe’re thrilled to serve you fresh and healthy treats! 🥝🍎🍇\n\nWarm regards,\n🍎 The Daily Fruit Co. Team`;
