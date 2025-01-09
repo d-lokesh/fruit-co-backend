@@ -127,10 +127,10 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
   orderType === "sample" && plan === "Premium Box" ? 149 :
   orderType === "subscription" && plan === "Premium Box" ? 2899 :
   orderType === "sample" && plan === "Regular Box" ? 99 :
-  orderType === "subscription" && plan === "Regular Box" ? 1899 :
+  orderType === "subscription" && plan === "Regular Box" ? 1899 :0;
 
   // Format deliveryDate to show only the date
- formattedDate = new Date(deliveryDate).toLocaleDateString("en-IN", {
+ const formattedDate = new Date(deliveryDate).toLocaleDateString("en-IN", {
   year: "numeric",
   month: "long",
   day: "numeric",
