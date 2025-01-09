@@ -118,7 +118,7 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
 
   const amount = 
   orderType === "sample" && plan === "Premium Box" ? 149 :
-  orderType === "Subscription" && plan === "Premium Box" ? 2899 :
+  orderType === "subscription" && plan === "Premium Box" ? 2899 :
   orderType === "sample" && plan === "Regular Box" ? 99 :
   orderType === "subscription" && plan === "Regular Box" ? 1899 :
   0;
