@@ -116,6 +116,9 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
   const client = getWhatsAppClient(); // Use the initialized client
   const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
 
+  console.log(orderType);
+  console.log(plan);
+
   const amount = 
   orderType === "Sample" && plan === "Premium box" ? 149 :
   orderType === "Subscription" && plan === "Premium box" ? 2899 :
