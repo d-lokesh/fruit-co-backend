@@ -83,7 +83,14 @@ const sendOrderConfirmationWhatsAppMessage = async (orderId,dfcPaymentId, phone,
   const client = getWhatsAppClient(); // Use the initialized client
   const formattedPhone = phone.startsWith('91') ? `${phone}@c.us` : `91${phone}@c.us`;
 
-  const whatsappMessage = `Hello ${name},\n\n✨ Great news! Your payment for Order ID: ${orderId} is successfully confirmed. 🏦\n\n💳 Payment ID: ${dfcPaymentId}\n\nYour order is now confirmed and scheduled for delivery. 🚛💨\n\nOrder details:\n🌟 Plan: ${plan}\n📅 Delivery Date: ${deliveryDate}\n📦 Type: ${orderType}\n\nWe're excited to deliver the freshest fruits to your doorstep! 🥝🍇🍎\n\nThank you for choosing Daily Fruit Co.!\nWarm regards,\n🍎 The Daily Fruit Co. Team`;
+// Format deliveryDate to show only the date
+const formattedDate = new Date(deliveryDate).toLocaleDateString("en-IN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const whatsappMessage = `Hello ${name},\n\n✨ Great news! Your payment for Order ID: ${orderId} is successfully confirmed. 🏦\n\n💳 Payment ID: ${dfcPaymentId}\n\nYour order is now confirmed and scheduled for delivery. 🚛💨\n\nOrder details:\n🌟 Plan: ${plan}\n📅 Delivery Date: ${formattedDate}\n📦 Type: ${orderType}\n\nWe're excited to deliver the freshest fruits to your doorstep! 🥝🍇🍎\n\nThank you for choosing Daily Fruit Co.!\nWarm regards,\n🍎 The Daily Fruit Co. Team`;
 
   try {
     const media = MessageMedia.fromFilePath('./acceptO.png'); // Path to your confirmation image
@@ -121,9 +128,16 @@ const sendQrCodeWhatsAppMessage = async (orderId, phone, name, plan, deliveryDat
   orderType === "subscription" && plan === "Premium Box" ? 2899 :
   orderType === "sample" && plan === "Regular Box" ? 99 :
   orderType === "subscription" && plan === "Regular Box" ? 1899 :
-  0;
 
-const whatsappMessage = `Hello ${name},\n\nThank you for choosing Daily Fruit Co.! 🎉\n\nOrder details:\n🌟 Plan: ${plan}\n📦 Type: ${orderType}\n📅 Delivery Date: ${deliveryDate}\n🆔 Order ID: ${orderId}\n💰 Amount Payable: ₹${amount}\n\nTo ensure your delivery is prepared as scheduled, please complete the payment of ₹${amount} using the QR code provided. Once confirmed, we’ll process your order promptly.\n\nWe’re thrilled to serve you fresh and healthy treats! 🥝🍎🍇\n\nWarm regards,\n🍎 The Daily Fruit Co. Team`;
+  // Format deliveryDate to show only the date
+ formattedDate = new Date(deliveryDate).toLocaleDateString("en-IN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+  
+
+  const whatsappMessage = `Hello ${name},\n\nThank you for choosing Daily Fruit Co.! 🎉\n\nOrder details:\n🌟 Plan: ${plan}\n📦 Type: ${orderType}\n📅 Delivery Date: ${formattedDate}\n🆔 Order ID: ${orderId}\n💰 Amount Payable: ₹${amount}\n\nTo ensure your delivery is prepared as scheduled, please complete the payment of ₹${amount} using the QR code provided. Once confirmed, we’ll process your order promptly.\n\nWe’re thrilled to serve you fresh and healthy treats! 🥝🍎🍇\n\nWarm regards,\n🍎 The Daily Fruit Co. Team`;
 
   try {
     const media = MessageMedia.fromFilePath('./finalQr.png'); // Path to your image
