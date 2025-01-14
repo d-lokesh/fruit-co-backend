@@ -20,6 +20,8 @@ const {
   sendQrCode
 } = require("../controllers/orderController");
 
+const {UserVisitfn,ButtonClickfn} = require("../controllers/siteAnalytics");
+
 
 router.get("/health-check", healthCheck);
 router.get("/dummy-health-check", dummyHealthCheck);
@@ -39,6 +41,10 @@ router.patch("/markOrderDelivered",auth, markOrderDelivered);
 
 router.delete('/deleteIfEmailEmpty',auth, deleteOrdersIfEmailEmpty); // Define the route
 router.get('/orderData', getOrderByQuery);
+router.post("/track-visit", UserVisitfn);
+router.post("/track-button-click", ButtonClickfn);
+
+
 
 
 
