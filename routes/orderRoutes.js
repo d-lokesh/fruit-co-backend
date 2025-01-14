@@ -20,10 +20,12 @@ const {
   sendQrCode
 } = require("../controllers/orderController");
 
-const {UserVisitfn,ButtonClickfn} = require("../controllers/siteAnalytics");
+const {UserVisitfn,ButtonClickfn,getSiteAnalytics} = require("../controllers/siteAnalytics");
 
 
 router.get("/health-check", healthCheck);
+router.get("/get-site-analytics",getSiteAnalytics);
+
 router.get("/dummy-health-check", dummyHealthCheck);
 router.get("/initWa",auth, intiWa);
 router.post("/", createOrder);
